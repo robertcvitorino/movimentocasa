@@ -8,8 +8,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class MemberForm
 {
@@ -39,13 +39,6 @@ class MemberForm
                         TextInput::make('instagram')
                             ->label('Instagram')
                             ->prefix('@'),
-                        Select::make('user_id')
-                            ->label('Usuário vinculado')
-                            ->relationship('user', 'email')
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->unique(ignoreRecord: true),
                     ])
                     ->columns(2),
                 Section::make('Endereço')

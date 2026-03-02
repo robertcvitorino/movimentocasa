@@ -67,7 +67,9 @@ class Formation extends Model
 
     public function lessons(): HasMany
     {
-        return $this->hasMany(FormationLesson::class)->orderBy('display_order');
+        return $this->hasMany(FormationLesson::class)
+            ->orderBy('display_order')
+            ->orderBy('id');
     }
 
     public function activeLessons(): HasMany

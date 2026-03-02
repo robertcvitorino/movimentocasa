@@ -16,40 +16,48 @@ class MinistryForm
         return $schema
             ->components([
                 Section::make('Dados do ministério')
+                    ->columnSpanFull()
+                    ->columns(4)
                     ->schema([
                         TextInput::make('name')
                             ->label('Nome')
                             ->required()
+                            ->columnSpan(2)
                             ->maxLength(255),
                         TextInput::make('slug')
                             ->label('Slug')
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
+
                         Select::make('status')
                             ->label('Status')
+                            ->placeholder('Selecione uma opção')
                             ->options(collect(MinistryStatus::cases())->mapWithKeys(fn (MinistryStatus $status) => [$status->value => $status->label()]))
                             ->required(),
+
                         Textarea::make('description')
                             ->label('Descrição')
                             ->rows(4)
                             ->columnSpanFull(),
-                    ])
-                    ->columns(2),
+                    ]),
                 Section::make('Equipe')
+                    ->columnSpanFull()
+                    ->columns(4)
                     ->schema([
                         Select::make('members')
                             ->label('Membros')
                             ->relationship('members', 'full_name')
                             ->multiple()
+                            ->columnSpan(2)
                             ->preload(),
                         Select::make('coordinators')
                             ->label('Coordenadores')
                             ->relationship('coordinators', 'full_name')
                             ->multiple()
+                            ->columnSpan(2)
                             ->preload(),
-                    ])
-                    ->columns(2),
+                    ]),
             ]);
     }
 }

@@ -107,8 +107,12 @@ class AttendFormation extends Page implements HasForms
     {
         $steps = [];
 
-        foreach ($this->getLessons() as $lesson) {
-            $steps[] = Step::make('Aula ' . $lesson->display_order)
+        foreach ($this->getLessons()->values() as $index => $lesson) {
+            $stepNumber = $index + 1;
+
+            $steps[] = Step::make('Aula ' . $stepNumber)
+                ->id('lesson-' . $lesson->getKey())
+                ->key('lesson-' . $lesson->getKey())
                 ->description($lesson->title)
                 ->columnSpanFull()
                 ->schema($this->getLessonStepSchema($lesson))
@@ -117,6 +121,8 @@ class AttendFormation extends Page implements HasForms
 
         if ($this->getRecord()->quiz?->is_active) {
             $steps[] = Step::make('Prova final')
+                ->id('final-quiz')
+                ->key('final-quiz')
                 ->description('Responda a avaliacao para concluir a formacao.')
                 ->schema($this->getQuizSchema());
         }

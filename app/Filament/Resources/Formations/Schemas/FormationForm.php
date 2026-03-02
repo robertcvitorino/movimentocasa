@@ -106,12 +106,27 @@ class FormationForm
                     ->schema([
                         Repeater::make('lessons')
                             ->relationship()
+                            ->orderColumn('display_order')
                             ->columnSpanFull()
                             ->columns(6)
                             ->label('Aulas')
                             ->defaultItems(0)
                             ->collapsed()
                             ->reorderableWithButtons()
+                            ->afterStateHydrated(function (?array $state, Set $set): void {
+                                $normalizedState = self::normalizeRepeaterDisplayOrder($state ?? []);
+
+                                if (($state ?? []) !== $normalizedState) {
+                                    $set('lessons', $normalizedState);
+                                }
+                            })
+                            ->afterStateUpdated(function (?array $state, Set $set): void {
+                                $normalizedState = self::normalizeRepeaterDisplayOrder($state ?? []);
+
+                                if (($state ?? []) !== $normalizedState) {
+                                    $set('lessons', $normalizedState);
+                                }
+                            })
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? 'Aula')
                             ->schema([
                                 TextInput::make('title')
@@ -128,7 +143,8 @@ class FormationForm
                                 TextInput::make('display_order')
                                     ->label('Ordem')
                                     ->numeric()
-                                    ->default(1)
+                                    ->readOnly()
+                                    ->dehydrated()
                                     ->required(),
 
                                 TextInput::make('estimated_duration_minutes')
@@ -267,5 +283,34 @@ class FormationForm
                     ])
                   ,
             ]);
+    }
+
+    public static function normalizeLessonsFormData(array $data): array
+    {
+        if (is_array($data['lessons'] ?? null)) {
+            $data['lessons'] = self::normalizeRepeaterDisplayOrder($data['lessons']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param  array<int|string, array<string, mixed>>  $items
+     * @return array<int|string, array<string, mixed>>
+     */
+    protected static function normalizeRepeaterDisplayOrder(array $items): array
+    {
+        $displayOrder = 1;
+
+        foreach ($items as $key => $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $item['display_order'] = $displayOrder++;
+            $items[$key] = $item;
+        }
+
+        return $items;
     }
 }

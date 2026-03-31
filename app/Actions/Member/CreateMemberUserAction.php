@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Role;
 class CreateMemberUserAction
 {
     /**
-     * @param  array{full_name: string, email: string}  $data
+     * @param  array{full_name: string, email: string, profile_photo_path?: ?string, is_active?: bool}  $data
      * @return array{temporary_password: string, user: User}
      */
     public function execute(array $data): array
@@ -23,8 +23,9 @@ class CreateMemberUserAction
         $user = User::query()->create([
             'name' => $data['full_name'],
             'email' => $data['email'],
+            'profile_photo_path' => $data['profile_photo_path'] ?? null,
             'password' => $temporaryPassword,
-            'is_active' => true,
+            'is_active' => $data['is_active'] ?? true,
         ]);
 
         Role::findOrCreate(RoleName::Member->value, 'web');

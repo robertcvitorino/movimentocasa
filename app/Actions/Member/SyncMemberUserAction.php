@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Role;
 class SyncMemberUserAction
 {
     /**
-     * @param  array{full_name: string, email: string}  $data
+     * @param  array{full_name: string, email: string, profile_photo_path?: ?string, is_active?: bool}  $data
      */
     public function execute(Member $member, array $data): void
     {
@@ -26,6 +26,8 @@ class SyncMemberUserAction
         $user->forceFill([
             'name' => $data['full_name'],
             'email' => $data['email'],
+            'profile_photo_path' => $data['profile_photo_path'] ?? null,
+            'is_active' => $data['is_active'] ?? true,
         ])->save();
 
         Role::findOrCreate(RoleName::Member->value, 'web');

@@ -6,9 +6,9 @@
 
         <title>{{ __('Welcome') }} - {{ config('app.name', 'Laravel') }}</title>
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="icon" href="{{ asset('image/logo_casa.png') }}" media="(prefers-color-scheme: light)">
+        <link rel="icon" href="{{ asset('image/logo_casa_dark.png') }}" media="(prefers-color-scheme: dark)">
+        <link rel="apple-touch-icon" href="{{ asset('image/logo_casa.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

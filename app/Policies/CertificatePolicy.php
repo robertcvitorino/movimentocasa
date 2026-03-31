@@ -14,12 +14,12 @@ class CertificatePolicy
     
     public function viewAny(AuthUser $authUser): bool
     {
-        return $authUser->can('ViewAny:Certificate');
+        return true;
     }
 
     public function view(AuthUser $authUser, Certificate $certificate): bool
     {
-        return $authUser->can('View:Certificate');
+        return true;
     }
 
     public function create(AuthUser $authUser): bool

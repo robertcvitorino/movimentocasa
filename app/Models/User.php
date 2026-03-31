@@ -5,7 +5,8 @@ namespace App\Models;
 use App\Enums\RoleName;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,11 +15,12 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
     use HasRoles;
+    use MustVerifyEmailTrait;
     use Notifiable;
     use TwoFactorAuthenticatable;
 
@@ -32,6 +34,7 @@ class User extends Authenticatable implements FilamentUser
     protected $fillable = [
         'name',
         'email',
+        'profile_photo_path',
         'password',
         'is_active',
         'last_login_at',
@@ -83,7 +86,10 @@ class User extends Authenticatable implements FilamentUser
                 RoleName::FinancialCoordinator->value,
             ]),
             'member' => $this->isSystemAdmin()
-                || ($this->hasRole(RoleName::Member->value) && $this->member()->exists()),
+                || (
+                    $this->hasRole(RoleName::Member->value)
+                    && $this->member()->exists()
+                ),
             default => false,
         };
     }

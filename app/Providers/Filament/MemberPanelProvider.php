@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Member\Auth\EmailVerificationPrompt;
+use App\Filament\Member\Auth\Login;
+use App\Filament\Member\Auth\Register;
 use App\Filament\Member\Widgets\MemberJourneyOverview;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -26,8 +29,16 @@ class MemberPanelProvider extends PanelProvider
         return $panel
             ->id('member')
             ->path('member')
-            ->login()
-            ->brandName('Movimento Casa')
+            ->login(Login::class)
+            ->registration(Register::class)
+            ->emailVerification(EmailVerificationPrompt::class)
+            ->brandName('')
+            ->brandLogo(asset('image/logo_casa.png'))
+            ->darkModeBrandLogo(asset('image/logo_casa_dark.png'))
+            ->favicon(asset('image/logo_casa.png'))
+            ->brandLogoHeight(fn (): string => str_starts_with((string) request()->route()?->getName(), 'filament.member.auth.')
+                ? '8rem'
+                : '2rem')
             ->colors([
                 'primary' => Color::Amber,
             ])

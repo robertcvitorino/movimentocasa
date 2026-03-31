@@ -9,6 +9,8 @@
         "fluxui-development",
         "livewire-development",
         "pest-testing",
-        "tailwindcss-development"
+        "tailwindcss-development",
+        "eloquent-best-practices",
+        "laravel-specialist"
     ]
 }

@@ -30,8 +30,15 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('Movimento Casa Admin')
+            ->brandName('')
+            ->brandLogo(asset('image/logo_casa.png'))
+            ->darkModeBrandLogo(asset('image/logo_casa_dark.png'))
+            ->brandLogoHeight(fn (): string => str_starts_with((string) request()->route()?->getName(), 'filament.admin.auth.')
+                ? '8rem'
+                : '2rem')
+            ->favicon(asset('image/logo_casa.png'))
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

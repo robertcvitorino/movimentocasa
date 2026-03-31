@@ -18,13 +18,16 @@ it('creates a member user with a temporary password and member role', function (
     $account = app(CreateMemberUserAction::class)->execute([
         'full_name' => 'Maria da Silva',
         'email' => 'maria@example.com',
+        'profile_photo_path' => 'users/profile-photos/maria.jpg',
+        'is_active' => false,
     ]);
 
     $user = $account['user'];
 
     expect($user->name)->toBe('Maria da Silva');
     expect($user->email)->toBe('maria@example.com');
-    expect($user->is_active)->toBeTrue();
+    expect($user->profile_photo_path)->toBe('users/profile-photos/maria.jpg');
+    expect($user->is_active)->toBeFalse();
     expect($user->hasRole(RoleName::Member->value))->toBeTrue();
     expect(Hash::check($account['temporary_password'], $user->password))->toBeTrue();
 });
@@ -41,6 +44,8 @@ it('syncs the linked user data when the member data changes', function () {
     app(SyncMemberUserAction::class)->execute($member, [
         'full_name' => 'Maria Atualizada',
         'email' => 'maria.atualizada@example.com',
+        'profile_photo_path' => 'users/profile-photos/maria-atualizada.jpg',
+        'is_active' => false,
     ]);
 
     $member->refresh();
@@ -48,6 +53,8 @@ it('syncs the linked user data when the member data changes', function () {
 
     expect($member->user->name)->toBe('Maria Atualizada');
     expect($member->user->email)->toBe('maria.atualizada@example.com');
+    expect($member->user->profile_photo_path)->toBe('users/profile-photos/maria-atualizada.jpg');
+    expect($member->user->is_active)->toBeFalse();
     expect($member->user->hasRole(RoleName::Member->value))->toBeTrue();
 });
 
@@ -80,4 +87,13 @@ it('sends an onboarding email with temporary password and password reset link', 
             return true;
         },
     );
+});
+
+it('persists the user profile photo path', function () {
+    $user = User::factory()->create([
+        'profile_photo_path' => 'users/profile-photos/maria.jpg',
+    ]);
+
+    expect($user->refresh()->profile_photo_path)
+        ->toBe('users/profile-photos/maria.jpg');
 });

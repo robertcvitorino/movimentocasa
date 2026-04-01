@@ -14,14 +14,13 @@ use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class FinancialGoalResource extends Resource
 {
     protected static ?string $model = FinancialGoal::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-flag';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Financeiro';
 

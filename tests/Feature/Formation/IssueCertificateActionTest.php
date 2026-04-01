@@ -60,4 +60,5 @@ it('issues a certificate PDF using the Movimento Casa template', function () {
     expect($html)->toContain('Nome da Pessoa');
     expect($html)->toContain('Iluminacao');
     expect($html)->toContain('Codigo de autenticacao');
+    expect($html)->not->toContain('Nota final');
 });

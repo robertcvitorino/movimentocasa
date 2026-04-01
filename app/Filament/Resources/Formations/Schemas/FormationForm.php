@@ -76,6 +76,7 @@ class FormationForm
                         TextInput::make('minimum_score')
                             ->label('Nota minima')
                             ->numeric()
+                            ->disabled(fn (Get $get): bool => $get('quiz.is_active') === false)
                             ->default(70),
 
                         Select::make('status')
@@ -211,28 +212,34 @@ class FormationForm
                             ]),
                     ]),
 
-                Section::make('Prova final')
+                Section::make('Quiz')
                     ->relationship('quiz')
                     ->columns(4)
                     ->columnSpanFull()
                     ->schema([
                         TextInput::make('title')
-                            ->label('Titulo da prova')
-                            ->default('Prova final'),
+                            ->label('Titulo do quiz')
+                            ->disabled(fn (Get $get): bool => $get('is_active') === false)
+                            ->dehydrated()
+                            ->default('Quiz final'),
                         TextInput::make('minimum_score')
                             ->label('Nota minima')
                             ->numeric()
+                            ->disabled(fn (Get $get): bool => $get('is_active') === false)
                             ->default(70),
                         TextInput::make('max_attempts')
                             ->label('Tentativas maximas')
                             ->numeric()
+                            ->disabled(fn (Get $get): bool => $get('is_active') === false)
                             ->default(3),
                         Toggle::make('is_active')
                             ->label('Quiz ativo')
+                            ->live()
                             ->default(true),
                         Repeater::make('questions')
                             ->relationship()
                             ->label('Perguntas')
+                            ->disabled(fn (Get $get): bool => $get('is_active') === false)
                             ->defaultItems(0)
                             ->collapsed()
                             ->reorderableWithButtons()

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Members\Schemas;
 
 use App\Enums\MemberStatus;
+use App\Enums\RoleName;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -11,6 +12,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Carbon;
+use Spatie\Permission\Models\Role;
 
 class MemberForm
 {
@@ -45,6 +47,7 @@ class MemberForm
 
                         Toggle::make('user_is_active')
                             ->label('Permitir acesso ao sistema')
+                            ->inline(false)
                             ->default(true),
                     ]),
                 Section::make('Dados pessoais')
@@ -53,15 +56,20 @@ class MemberForm
                     ->schema([
                         DatePicker::make('birth_date')
                             ->label('Data de nascimento'),
+
+                        TextInput::make('instagram')
+                            ->label('Instagram')
+                            ->prefix('@'),
                         TextInput::make('phone')
                             ->label('Telefone')
                             ->tel()
                             ->maxLength(30),
+
                         Toggle::make('is_whatsapp')
+                            ->inline(false)
                             ->label('E WhatsApp?'),
-                        TextInput::make('instagram')
-                            ->label('Instagram')
-                            ->prefix('@'),
+
+
                     ]),
                 Section::make('Endereco')
                     ->columns(4)
@@ -88,6 +96,18 @@ class MemberForm
                         DatePicker::make('joined_at')
                             ->label('Entrada no grupo')
                             ->default(Carbon::today()),
+
+                        Select::make('user_role_name')
+                            ->label('Grupo de permissao')
+                            ->options(fn (): array => Role::query()
+                                ->where('guard_name', 'web')
+                                ->orderBy('name')
+                                ->pluck('name', 'name')
+                                ->all())
+                            ->default(RoleName::Member->value)
+                            ->searchable()
+                            ->preload()
+                            ->required(),
                         Select::make('titles')
                             ->label('Sacramentos')
                             ->relationship('titles', 'name')

@@ -24,7 +24,6 @@ use Filament\Schemas\Components\View;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
-use Filament\Support\Concerns\HasIcon;
 use Filament\Support\Enums\Width;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
@@ -119,12 +118,21 @@ class AttendFormation extends Page implements HasForms
                 ->afterValidation(fn () => $this->completeLessonStep($lesson));
         }
 
-        if ($this->getRecord()->quiz?->is_active) {
-            $steps[] = Step::make('Prova final')
+        if ($this->hasActiveQuiz()) {
+            $steps[] = Step::make('Quiz')
                 ->id('final-quiz')
                 ->key('final-quiz')
-                ->description('Responda a avaliacao para concluir a formacao.')
+                ->description('Responda ao quiz para acompanhar seu desempenho.')
                 ->schema($this->getQuizSchema());
+        } else {
+            $steps[] = Step::make('Conclusao')
+                ->id('completion')
+                ->key('completion')
+                ->description('Finalize para gerar o certificado da formacao.')
+                ->schema([
+                    Text::make('Clique em "Gerar certificado" para concluir a formacao.')
+                        ->color('success'),
+                ]);
         }
 
         return $steps;
@@ -181,7 +189,7 @@ class AttendFormation extends Page implements HasForms
         if (! $quiz) {
             return [
                 Radio::make('quiz_unavailable')
-                    ->label('Nao ha prova configurada para esta formacao.')
+                    ->label('Nao ha quiz configurado para esta formacao.')
                     ->disabled(),
             ];
         }
@@ -216,8 +224,8 @@ class AttendFormation extends Page implements HasForms
             return $completedLessons + 1;
         }
 
-        if (! $this->getRecord()->quiz?->is_active) {
-            return max($lessonCount, 1);
+        if (! $this->hasActiveQuiz()) {
+            return max($lessonCount + 1, 1);
         }
 
         return $lessonCount + 1;
@@ -227,11 +235,23 @@ class AttendFormation extends Page implements HasForms
     {
         $quiz = $this->getRecord()->quiz;
 
-        if (! $quiz || ! $this->progress) {
+        if (! $this->progress) {
+            abort(403);
+        }
+
+        if (! $quiz || ! $quiz->is_active) {
+            $this->loadProgress();
+
+            if ($this->progress->status === \App\Enums\FormationProgressStatus::Completed && $this->getRecord()->certificate_enabled) {
+                app(\App\Actions\Formation\IssueCertificateAction::class)->execute($this->progress);
+            }
+
             Notification::make()
-                ->title('Esta formacao nao possui prova configurada')
-                ->warning()
+                ->title('Formacao concluida')
+                ->success()
                 ->send();
+
+            $this->redirect(FormationResource::getUrl(), navigate: true);
 
             return;
         }
@@ -245,7 +265,7 @@ class AttendFormation extends Page implements HasForms
             );
         } catch (ValidationException $exception) {
             Notification::make()
-                ->title('Nao foi possivel enviar a prova')
+                ->title('Nao foi possivel enviar o quiz')
                 ->body(collect($exception->errors())->flatten()->implode(' '))
                 ->danger()
                 ->send();
@@ -256,12 +276,11 @@ class AttendFormation extends Page implements HasForms
         $this->loadProgress();
 
         Notification::make()
-            ->title($attempt->status->value === 'passed' ? 'Prova aprovada' : 'Prova enviada')
+            ->title('Quiz enviado')
             ->body(
-                $attempt->status->value === 'passed'
-                    ? 'Nota final: ' . $attempt->score . '%.'
-                        . ($this->getRecord()->certificate_enabled ? ' Certificado emitido com sucesso.' : '')
-                    : 'Nota final: ' . $attempt->score . '%.'
+                $this->progress->status === \App\Enums\FormationProgressStatus::Completed && $this->getRecord()->certificate_enabled
+                    ? 'Quiz enviado com sucesso. Certificado emitido com sucesso.'
+                    : 'Quiz enviado com sucesso.'
             )
             ->success()
             ->send();
@@ -370,10 +389,17 @@ class AttendFormation extends Page implements HasForms
 
     protected function getWizardSubmitAction(): Htmlable
     {
+        $buttonLabel = $this->hasActiveQuiz() ? 'Enviar quiz' : 'Gerar certificado';
+
         return new HtmlString(Blade::render(<<<'BLADE'
             <x-filament::button type="submit" size="lg" x-on:click="window.pauseFormationMedia?.()">
-                Enviar prova final
+                {{ $buttonLabel }}
             </x-filament::button>
-        BLADE));
+        BLADE, ['buttonLabel' => $buttonLabel]));
+    }
+
+    protected function hasActiveQuiz(): bool
+    {
+        return (bool) $this->getRecord()->quiz?->is_active;
     }
 }

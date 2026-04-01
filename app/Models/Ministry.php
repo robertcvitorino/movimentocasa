@@ -47,4 +47,9 @@ class Ministry extends Model
     {
         return $this->hasMany(Formation::class);
     }
+
+    public function events(): BelongsToMany
+    {
+        return $this->belongsToMany(Event::class, 'event_ministry')->withTimestamps();
+    }
 }

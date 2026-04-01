@@ -24,9 +24,6 @@ class MembersTable
                     ->searchable(),
                 TextColumn::make('phone')
                     ->label('Telefone'),
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->badge(),
                 TextColumn::make('ministries.name')
                     ->label('Ministérios')
                     ->listWithLineBreaks()
@@ -46,9 +43,7 @@ class MembersTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+
             ]);
     }
 }

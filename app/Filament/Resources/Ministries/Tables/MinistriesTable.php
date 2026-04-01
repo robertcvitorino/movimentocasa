@@ -16,32 +16,22 @@ class MinistriesTable
         return $table
             ->columns([
                 TextColumn::make('name')->label('Nome')->searchable()->sortable(),
-                TextColumn::make('status')->label('Status')->badge(),
                 TextColumn::make('coordinators.full_name')
                     ->label('Coordenadores')
                     ->listWithLineBreaks()
                     ->limitList(2),
                 TextColumn::make('members_count')
                     ->label('Membros')
-                    ->counts('members')
-                    ->sortable(),
+                    ->alignCenter()
+                    ->counts('members'),
             ])
             ->filters([
-                SelectFilter::make('status')
-                    ->label('Status')
-                    ->options([
-                        'active' => 'Ativo',
-                        'inactive' => 'Inativo',
-                        'archived' => 'Arquivado',
-                    ]),
             ])
             ->recordActions([
                 EditAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+
             ]);
     }
 }

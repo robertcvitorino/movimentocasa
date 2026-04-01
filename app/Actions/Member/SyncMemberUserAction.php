@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Role;
 class SyncMemberUserAction
 {
     /**
-     * @param  array{full_name: string, email: string, profile_photo_path?: ?string, is_active?: bool}  $data
+     * @param  array{full_name: string, email: string, profile_photo_path?: ?string, is_active?: bool, role_name?: ?string}  $data
      */
     public function execute(Member $member, array $data): void
     {
@@ -30,11 +30,9 @@ class SyncMemberUserAction
             'is_active' => $data['is_active'] ?? true,
         ])->save();
 
-        Role::findOrCreate(RoleName::Member->value, 'web');
-
-        if (! $user->hasRole(RoleName::Member->value)) {
-            $user->assignRole(RoleName::Member->value);
-        }
+        $roleName = $data['role_name'] ?? RoleName::Member->value;
+        Role::findOrCreate($roleName, 'web');
+        $user->syncRoles([$roleName]);
     }
 
     protected function ensureEmailIsAvailable(string $email, User $user): void

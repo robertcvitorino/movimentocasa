@@ -2,6 +2,7 @@
 
 namespace App\Actions\Formation;
 
+use App\Enums\FormationProgressStatus;
 use App\Enums\LessonProgressStatus;
 use App\Models\FormationLesson;
 use App\Models\MemberFormationProgress;
@@ -24,7 +25,17 @@ class CompleteFormationLessonAction
                 'last_watched_at' => now(),
             ])->save();
 
-            return app(SyncFormationProgressAction::class)->execute($progress);
+            $progress = app(SyncFormationProgressAction::class)->execute($progress);
+            $progress->loadMissing('formation');
+
+            if (
+                $progress->status === FormationProgressStatus::Completed
+                && $progress->formation?->certificate_enabled
+            ) {
+                app(IssueCertificateAction::class)->execute($progress);
+            }
+
+            return $progress;
         });
     }
 }

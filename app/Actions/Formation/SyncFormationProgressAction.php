@@ -25,13 +25,11 @@ class SyncFormationProgressAction
             ->filter(fn ($lesson) => $lessonProgress->get($lesson->getKey())?->status === LessonProgressStatus::Completed)
             ->count();
 
-        $requiresQuiz = $formation->quiz()->where('is_active', true)->exists();
-        $quizPassed = filled($progress->quiz_passed_at);
         $allRequiredLessonsCompleted = $requiredLessonsCount === $completedRequiredLessonsCount;
 
         $status = FormationProgressStatus::InProgress;
 
-        if ($allRequiredLessonsCompleted && (! $requiresQuiz || $quizPassed)) {
+        if ($allRequiredLessonsCompleted) {
             $status = FormationProgressStatus::Completed;
         }
 

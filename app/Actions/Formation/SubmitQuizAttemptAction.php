@@ -78,7 +78,7 @@ class SubmitQuizAttemptAction
 
             $progress = app(SyncFormationProgressAction::class)->execute($progress);
 
-            if ($passed && $progress->status === \App\Enums\FormationProgressStatus::Completed && $formation->certificate_enabled) {
+            if ($progress->status === \App\Enums\FormationProgressStatus::Completed && $formation->certificate_enabled) {
                 app(IssueCertificateAction::class)->execute($progress);
             }
 

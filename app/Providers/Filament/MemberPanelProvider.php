@@ -15,6 +15,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
+use Guava\Calendar\CalendarPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -31,6 +32,7 @@ class MemberPanelProvider extends PanelProvider
             ->path('member')
             ->login(Login::class)
             ->registration(Register::class)
+            ->passwordReset()
             ->emailVerification(EmailVerificationPrompt::class)
             ->brandName('')
             ->brandLogo(asset('image/logo_casa.png'))
@@ -46,10 +48,12 @@ class MemberPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Member/Widgets'), for: 'App\Filament\Member\Widgets')
             ->widgets([
                 AccountWidget::class,
                 MemberJourneyOverview::class,
+            ])
+            ->plugins([
+                CalendarPlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,

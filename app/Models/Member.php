@@ -86,4 +86,9 @@ class Member extends Model
     {
         return $this->hasMany(Certificate::class);
     }
+
+    public function events(): BelongsToMany
+    {
+        return $this->belongsToMany(Event::class, 'event_member')->withTimestamps();
+    }
 }

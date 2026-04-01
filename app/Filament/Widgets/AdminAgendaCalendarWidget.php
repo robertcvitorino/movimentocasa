@@ -3,8 +3,10 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Support\AgendaEventForm;
+use App\Filament\Support\AgendaTaskForm;
 use App\Filament\Support\CalendarPresentation;
 use App\Models\Event;
+use App\Models\Task;
 use App\Services\EventRecurrenceService;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -31,6 +33,8 @@ class AdminAgendaCalendarWidget extends CalendarWidget
     protected ?string $defaultEventClickAction = 'edit';
 
     protected ?string $locale = 'pt-BR';
+
+    protected bool $useFilamentTimezone = true;
 
     protected array $options = CalendarPresentation::DEFAULT_OPTIONS;
 
@@ -81,6 +85,23 @@ class AdminAgendaCalendarWidget extends CalendarWidget
             }
         }
 
+        $tasks = Task::query()
+            ->with(['ministry', 'responsibleMember', 'responsibleMinistry'])
+            ->where('start_datetime', '<=', $rangeEnd)
+            ->where('end_datetime', '>=', $rangeStart)
+            ->get();
+
+        foreach ($tasks as $task) {
+            $calendarEvents->push(
+                CalendarEvent::make($task)
+                    ->title('Tarefa: ' . $task->title)
+                    ->start(Carbon::instance($task->start_datetime->toMutable()))
+                    ->end(Carbon::instance($task->end_datetime->toMutable()))
+                    ->backgroundColor($task->resolveCalendarColor())
+                    ->action('editTask')
+            );
+        }
+
         return $calendarEvents;
     }
 
@@ -92,6 +113,11 @@ class AdminAgendaCalendarWidget extends CalendarWidget
     public function eventSchema(Schema $schema): Schema
     {
         return $schema->components(AgendaEventForm::schema());
+    }
+
+    public function taskSchema(Schema $schema): Schema
+    {
+        return $schema->components(AgendaTaskForm::schema());
     }
 
     public function createEventAction(): CreateAction
@@ -128,6 +154,31 @@ class AdminAgendaCalendarWidget extends CalendarWidget
             });
     }
 
+    public function createTaskAction(): CreateAction
+    {
+        return $this->createAction(Task::class, 'createTask')
+            ->label('Criar tarefa')
+            ->createAnother(false)
+            ->mountUsing(function (Schema $schema): void {
+                $clickedDate = $this->getRawCalendarContextData('date');
+                $start = filled($clickedDate)
+                    ? CarbonImmutable::parse((string) $clickedDate)
+                    : now();
+                $end = $start->addHour();
+
+                $schema->fill([
+                    'start_datetime' => $start,
+                    'end_datetime' => $end,
+                ]);
+            })
+            ->mutateDataUsing(function (array $data): array {
+                $data = AgendaTaskForm::normalizeResponsibility($data);
+                $data['created_by'] = auth()->id();
+
+                return $data;
+            });
+    }
+
     public function editAction(): EditAction
     {
         return parent::editAction()
@@ -156,6 +207,19 @@ class AdminAgendaCalendarWidget extends CalendarWidget
             });
     }
 
+    public function editTaskAction(): EditAction
+    {
+        return EditAction::make('editTask')
+            ->model(Task::class)
+            ->record(fn (): ?Task => $this->getEventRecord() instanceof Task ? $this->getEventRecord() : null)
+            ->schema(fn (EditAction $action, Schema $schema): Schema => $this
+                ->getFormSchemaForModel($schema, $action->getModel())
+                ->record($this->getEventRecord()))
+            ->mutateDataUsing(fn (array $data): array => AgendaTaskForm::normalizeResponsibility($data))
+            ->after(fn (): mixed => $this->refreshRecords())
+            ->cancelParentActions();
+    }
+
     public function deleteAction(): DeleteAction
     {
         return parent::deleteAction();
@@ -165,6 +229,7 @@ class AdminAgendaCalendarWidget extends CalendarWidget
     {
         return [
             $this->createEventAction(),
+            $this->createTaskAction(),
         ];
     }
 }

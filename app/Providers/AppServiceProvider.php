@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Event;
 use App\Observers\EventObserver;
 use Carbon\CarbonImmutable;
+use Filament\Support\Facades\FilamentTimezone;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -35,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
     protected function configureDefaults(): void
     {
         Date::use(CarbonImmutable::class);
+        FilamentTimezone::set('America/Sao_Paulo');
 
         DB::prohibitDestructiveCommands(
             app()->isProduction(),

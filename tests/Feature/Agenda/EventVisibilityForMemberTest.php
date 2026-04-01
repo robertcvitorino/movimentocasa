@@ -31,3 +31,22 @@ it('shows general, ministry and direct events for the member scope', function ()
     expect($visibleTitles)->toContain($generalEvent->title, $ministryEvent->title, $directEvent->title);
     expect($visibleTitles)->not->toContain($hiddenEvent->title);
 });
+
+it('shows ministry events for members on leave in the ministry', function () {
+    $member = Member::factory()->create();
+    $ministry = Ministry::factory()->create();
+
+    $ministry->members()->attach($member->getKey(), [
+        'status' => MemberMinistryStatus::OnLeave->value,
+    ]);
+
+    $ministryEvent = Event::factory()->create(['title' => 'Evento ministerio afastado']);
+    $ministryEvent->ministries()->attach($ministry->getKey());
+
+    $visibleTitles = Event::query()
+        ->visibleToMember($member)
+        ->pluck('title')
+        ->all();
+
+    expect($visibleTitles)->toContain($ministryEvent->title);
+});

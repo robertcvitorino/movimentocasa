@@ -91,4 +91,9 @@ class Member extends Model
     {
         return $this->belongsToMany(Event::class, 'event_member')->withTimestamps();
     }
+
+    public function assignedTasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'responsible_member_id');
+    }
 }

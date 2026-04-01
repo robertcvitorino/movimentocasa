@@ -82,22 +82,29 @@ class Event extends Model
     public function scopeVisibleToMember(Builder $query, Member $member): Builder
     {
         $memberId = $member->getKey();
-        $activeMinistryIds = DB::table('member_ministry')
+        $ministryIds = DB::table('member_ministry')
             ->where('member_id', $memberId)
-            ->where('status', MemberMinistryStatus::Active->value)
+            ->whereIn('status', [
+                MemberMinistryStatus::Active->value,
+                MemberMinistryStatus::OnLeave->value,
+            ])
             ->pluck('ministry_id');
 
-        return $query->where(function (Builder $audienceQuery) use ($memberId, $activeMinistryIds): void {
+        return $query->where(function (Builder $audienceQuery) use ($member, $memberId, $ministryIds): void {
             $audienceQuery->where(function (Builder $generalQuery): void {
                 $generalQuery->whereDoesntHave('ministries')
                     ->whereDoesntHave('members');
             });
 
-            if ($activeMinistryIds->isNotEmpty()) {
-                $audienceQuery->orWhereHas('ministries', fn (Builder $ministryQuery) => $ministryQuery->whereIn('ministries.id', $activeMinistryIds));
+            if ($ministryIds->isNotEmpty()) {
+                $audienceQuery->orWhereHas('ministries', fn (Builder $ministryQuery) => $ministryQuery->whereIn('ministries.id', $ministryIds));
             }
 
-            $audienceQuery->orWhereHas('members', fn (Builder $memberQuery) => $memberQuery->where('members.id', $memberId));
+            $audienceQuery->orWhereHas('members', function (Builder $memberQuery) use ($member, $memberId): void {
+                $memberQuery
+                    ->where('members.id', $memberId)
+                    ->orWhere('members.user_id', $member->user_id);
+            });
         });
     }
 

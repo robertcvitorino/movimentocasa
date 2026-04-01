@@ -4,6 +4,7 @@ namespace App\Filament\Member\Widgets;
 
 use App\Filament\Support\CalendarPresentation;
 use App\Models\Event;
+use App\Models\Task;
 use App\Services\EventRecurrenceService;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -21,6 +22,8 @@ class MemberAgendaCalendarWidget extends CalendarWidget
     protected bool $eventClickEnabled = false;
 
     protected ?string $locale = 'pt-BR';
+
+    protected bool $useFilamentTimezone = true;
 
     protected array $options = CalendarPresentation::DEFAULT_OPTIONS;
 
@@ -67,6 +70,24 @@ class MemberAgendaCalendarWidget extends CalendarWidget
                         ->extendedProp('occurrence_id', $occurrence['id'])
                 );
             }
+        }
+
+        $tasks = Task::query()
+            ->with(['ministry', 'responsibleMember', 'responsibleMinistry'])
+            ->visibleToUser(auth()->user())
+            ->where('start_datetime', '<=', $rangeEnd)
+            ->where('end_datetime', '>=', $rangeStart)
+            ->get();
+
+        foreach ($tasks as $task) {
+            $calendarEvents->push(
+                CalendarEvent::make($task)
+                    ->title('Tarefa: ' . $task->title)
+                    ->start(Carbon::instance($task->start_datetime->toMutable()))
+                    ->end(Carbon::instance($task->end_datetime->toMutable()))
+                    ->backgroundColor($task->resolveCalendarColor())
+                    ->action('view')
+            );
         }
 
         return $calendarEvents;

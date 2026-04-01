@@ -52,4 +52,14 @@ class Ministry extends Model
     {
         return $this->belongsToMany(Event::class, 'event_ministry')->withTimestamps();
     }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function assignedTasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'responsible_ministry_id');
+    }
 }

@@ -79,7 +79,6 @@ class AgendaEventForm
                         )
                         ->default(EventAudienceType::General->value)
                         ->live()
-                        ->dehydrated(false)
                         ->required(),
                     Select::make('ministry_ids')
                         ->label('Ministerios')

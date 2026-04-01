@@ -96,4 +96,14 @@ class Member extends Model
     {
         return $this->hasMany(Task::class, 'responsible_member_id');
     }
+
+    public function noticeLikes(): HasMany
+    {
+        return $this->hasMany(NoticeLike::class);
+    }
+
+    public function noticeComments(): HasMany
+    {
+        return $this->hasMany(NoticeComment::class);
+    }
 }

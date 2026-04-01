@@ -2,6 +2,7 @@
 
 namespace App\Filament\Member\Widgets;
 
+use App\Filament\Support\CalendarPresentation;
 use App\Models\Event;
 use App\Services\EventRecurrenceService;
 use Carbon\Carbon;
@@ -21,25 +22,7 @@ class MemberAgendaCalendarWidget extends CalendarWidget
 
     protected ?string $locale = 'pt-BR';
 
-    protected array $options = [
-        'height' => 'auto',
-        'headerToolbar' => [
-            'start' => 'dayGridMonth,timeGridWeek,timeGridDay',
-            'center' => 'title',
-            'end' => 'prev,next today',
-        ],
-        'buttonText' => [
-            'today' => 'Hoje',
-            'dayGridMonth' => 'Mes',
-            'timeGridWeek' => 'Semana',
-            'timeGridDay' => 'Dia',
-        ],
-        'eventTimeFormat' => [
-            'hour' => '2-digit',
-            'minute' => '2-digit',
-            'hour12' => false,
-        ],
-    ];
+    protected array $options = CalendarPresentation::DEFAULT_OPTIONS;
 
     protected function getEvents(FetchInfo $info): Collection|array|Builder
     {

@@ -81,6 +81,9 @@ class AttendFormation extends Page implements HasForms
                 Wizard::make($this->getSteps())
                     ->persistStepInQueryString()
                     ->startOnStep($this->getStartStep())
+                    ->extraAttributes([
+                        'class' => 'formation-attend-wizard',
+                    ])
                     ->nextAction(fn (Action $action): Action => $action->extraAttributes([
                         'x-on:click' => 'window.pauseFormationMedia?.()',
                     ]))

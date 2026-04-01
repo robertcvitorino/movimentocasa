@@ -24,14 +24,6 @@ class SubmitQuizAttemptAction
             ]);
         }
 
-        $attemptsCount = $progress->quizAttempts()->count();
-
-        if ($attemptsCount >= $quiz->max_attempts) {
-            throw ValidationException::withMessages([
-                'quiz' => 'Limite de tentativas atingido.',
-            ]);
-        }
-
         return DB::transaction(function () use ($formation, $progress, $quiz, $answers): QuizAttempt {
             $attempt = $progress->quizAttempts()->create([
                 'quiz_id' => $quiz->getKey(),

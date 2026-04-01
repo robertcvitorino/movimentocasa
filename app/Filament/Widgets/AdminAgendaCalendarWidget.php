@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Support\AgendaEventForm;
+use App\Filament\Support\CalendarPresentation;
 use App\Models\Event;
 use App\Services\EventRecurrenceService;
 use Carbon\Carbon;
@@ -31,25 +32,7 @@ class AdminAgendaCalendarWidget extends CalendarWidget
 
     protected ?string $locale = 'pt-BR';
 
-    protected array $options = [
-        'height' => 'auto',
-        'headerToolbar' => [
-            'start' => 'dayGridMonth,timeGridWeek,timeGridDay',
-            'center' => 'title',
-            'end' => 'prev,next today',
-        ],
-        'buttonText' => [
-            'today' => 'Hoje',
-            'dayGridMonth' => 'Mes',
-            'timeGridWeek' => 'Semana',
-            'timeGridDay' => 'Dia',
-        ],
-        'eventTimeFormat' => [
-            'hour' => '2-digit',
-            'minute' => '2-digit',
-            'hour12' => false,
-        ],
-    ];
+    protected array $options = CalendarPresentation::DEFAULT_OPTIONS;
 
     /**
      * @var array{audience_type: \App\Enums\EventAudienceType, ministry_ids: array<int, int>, member_ids: array<int, int>}

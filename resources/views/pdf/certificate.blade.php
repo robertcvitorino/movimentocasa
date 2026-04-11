@@ -17,15 +17,9 @@
         }
 
         .frame {
-            border: 2pt solid #f4b8b8;
+            border: 2pt solid #3b82f6;
             margin: 8pt;
-            padding: 8pt;
-            min-height: 559pt;
-        }
-
-        .frame-inner {
-            border: 1pt dashed rgba(239, 68, 68, 0.35);
-            min-height: 541pt;
+            min-height: 571pt;
         }
 
         .content {
@@ -98,7 +92,6 @@
 </head>
 <body>
     <div class="frame">
-        <div class="frame-inner">
             <div class="content">
                 <div class="logo">
                     <img src="{{ public_path('image/logo_casa_sm.png') }}" alt="Logo">
@@ -132,7 +125,6 @@
                     Emitido em: {{ $issuedAt->format('d/m/Y H:i') }}
                 </div>
             </div>
-        </div>
     </div>
 </body>
 </html>

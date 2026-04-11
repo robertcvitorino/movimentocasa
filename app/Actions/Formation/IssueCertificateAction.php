@@ -5,6 +5,10 @@ namespace App\Actions\Formation;
 use App\Models\Certificate;
 use App\Models\MemberFormationProgress;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -22,6 +26,11 @@ class IssueCertificateAction
 
             $certificateCode = $this->generateCertificateCode();
             $issuedAt = now();
+            $verificationHash = hash('sha256', $certificateCode . '|' . Str::uuid());
+
+            $verificationUrl = route('certificates.verify', $verificationHash);
+            $qrCodeBase64 = $this->generateQrCode($verificationUrl);
+
             $filePath = sprintf(
                 'certificates/%s/%s.pdf',
                 $progress->member_id,
@@ -34,6 +43,8 @@ class IssueCertificateAction
                 'member' => $progress->member,
                 'formation' => $progress->formation,
                 'progress' => $progress,
+                'qrCodeBase64' => $qrCodeBase64,
+                'verificationUrl' => $verificationUrl,
             ])
                 ->setPaper('a4', 'landscape')
                 ->setOption('dpi', 72)
@@ -49,7 +60,7 @@ class IssueCertificateAction
                 'certificate_code' => $certificateCode,
                 'issued_at' => $issuedAt,
                 'pdf_path' => $filePath,
-                'verification_hash' => hash('sha256', $certificateCode . '|' . Str::uuid()),
+                'verification_hash' => $verificationHash,
             ]);
 
             $progress->forceFill([
@@ -67,5 +78,19 @@ class IssueCertificateAction
         } while (Certificate::query()->where('certificate_code', $code)->exists());
 
         return $code;
+    }
+
+    protected function generateQrCode(string $url): string
+    {
+        $builder = new Builder(
+            writer: new PngWriter,
+            data: $url,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::Medium,
+            size: 150,
+            margin: 5,
+        );
+
+        return base64_encode($builder->build()->getString());
     }
 }

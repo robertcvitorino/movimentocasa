@@ -19,12 +19,12 @@
         .frame {
             border: 2pt solid #3b82f6;
             margin: 8pt;
-            min-height: 571pt;
+            min-height: 565pt;
         }
 
         .content {
             text-align: center;
-            padding: 90pt 60pt 40pt 60pt;
+            padding: 50pt 60pt 20pt 60pt;
         }
 
         .logo img {
@@ -83,10 +83,25 @@
         }
 
         .meta-block {
-            padding-top: 28pt;
+            padding-top: 18pt;
             font-size: 8pt;
             color: #374151;
-            line-height: 1.8;
+            line-height: 1.6;
+        }
+
+        .qr-section {
+            padding-top: 10pt;
+        }
+
+        .qr-section img {
+            width: 50pt;
+            height: 50pt;
+        }
+
+        .qr-label {
+            font-size: 6pt;
+            color: #9ca3af;
+            padding-top: 3pt;
         }
     </style>
 </head>
@@ -124,6 +139,13 @@
                     Código de autenticação: {{ $certificateCode }}<br>
                     Emitido em: {{ $issuedAt->format('d/m/Y H:i') }}
                 </div>
+
+                @if (!empty($qrCodeBase64))
+                    <div class="qr-section">
+                        <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
+                        <div class="qr-label">Escaneie para verificar autenticidade</div>
+                    </div>
+                @endif
             </div>
     </div>
 </body>

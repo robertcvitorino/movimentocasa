@@ -20,15 +20,17 @@
             border: 2pt solid #f4b8b8;
             margin: 8pt;
             padding: 8pt;
+            min-height: 559pt;
         }
 
         .frame-inner {
             border: 1pt dashed rgba(239, 68, 68, 0.35);
+            min-height: 541pt;
         }
 
         .content {
             text-align: center;
-            padding: 60pt 60pt 40pt 60pt;
+            padding: 90pt 60pt 40pt 60pt;
         }
 
         .logo img {

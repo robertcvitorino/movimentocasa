@@ -34,7 +34,11 @@ class IssueCertificateAction
                 'member' => $progress->member,
                 'formation' => $progress->formation,
                 'progress' => $progress,
-            ])->setPaper('a4', 'landscape');
+            ])
+                ->setPaper('a4', 'landscape')
+                ->setOption('dpi', 72)
+                ->setOption('defaultMediaType', 'print')
+                ->setOption('isFontSubsettingEnabled', true);
 
             Storage::disk('public')->put($filePath, $pdf->output());
 

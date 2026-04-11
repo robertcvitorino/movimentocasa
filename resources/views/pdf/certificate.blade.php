@@ -5,7 +5,7 @@
     <title>Certificado</title>
     <style>
         @page {
-            margin: 8mm;
+            margin: 0;
             size: A4 landscape;
         }
 
@@ -13,22 +13,30 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 297mm;
+            height: 210mm;
+            overflow: hidden;
+        }
+
         body {
             font-family: DejaVu Sans, sans-serif;
             color: #3f3f46;
-            margin: 0;
-            padding: 0;
             background: #fffdfb;
         }
 
         .page {
             position: relative;
             overflow: hidden;
-            min-height: 190mm;
-            width: 100%;
-            padding: 18mm 20mm 14mm;
+            width: 297mm;
+            height: 210mm;
+            padding: 14mm 20mm 10mm;
             border: 2px solid #f4b8b8;
             background: linear-gradient(180deg, #fffefe 0%, #fff9f9 100%);
+            page-break-inside: avoid;
+            page-break-after: avoid;
         }
 
         .content {
@@ -89,49 +97,49 @@
         }
 
         .eyebrow {
-            font-size: 13px;
+            font-size: 12px;
             letter-spacing: 0.06em;
             text-transform: uppercase;
             color: #57534e;
             font-weight: 700;
-            margin-top: 16px;
+            margin-top: 8px;
         }
 
         .title {
-            font-size: 31px;
+            font-size: 28px;
             font-weight: 700;
             color: #111827;
-            margin-top: 18px;
-            margin-bottom: 28px;
+            margin-top: 10px;
+            margin-bottom: 16px;
         }
 
         .text {
-            font-size: 16px;
-            line-height: 1.45;
+            font-size: 15px;
+            line-height: 1.4;
             margin: 0;
             color: #5b5560;
         }
 
         .member-name {
-            font-size: 46px;
-            line-height: 1.08;
+            font-size: 40px;
+            line-height: 1.1;
             font-weight: 700;
             color: #1657b8;
-            margin: 28px 0 24px;
+            margin: 14px 0 12px;
         }
 
         .formation-title {
-            font-size: 28px;
-            line-height: 1.15;
+            font-size: 24px;
+            line-height: 1.2;
             font-weight: 700;
-            margin: 10px 0 12px;
+            margin: 8px 0 8px;
             color: #2d23b6;
         }
 
         .meta {
-            margin-top: 32px;
-            font-size: 12px;
-            line-height: 1.35;
+            margin-top: 16px;
+            font-size: 11px;
+            line-height: 1.5;
             color: #18181b;
         }
 
@@ -148,9 +156,9 @@
         }
 
         .top-logo {
-            width: 24px;
-            height: 28px;
-            margin: 0 auto 10px;
+            width: 22px;
+            height: 26px;
+            margin: 0 auto 6px;
             color: #a1a1aa;
         }
 

@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\CertificateVerificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('filament.member.auth.login');
 })->name('home');
+
+Route::get('/certificados/{hash}', CertificateVerificationController::class)
+    ->name('certificates.verify');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {

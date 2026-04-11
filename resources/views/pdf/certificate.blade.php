@@ -97,7 +97,7 @@
                     <img src="{{ public_path('image/logo_casa_sm.png') }}" alt="Logo">
                 </div>
 
-                <div class="eyebrow">Certificado de Conclusao</div>
+                <div class="eyebrow">Certificado de Conclusão</div>
 
                 <div class="org-name">Movimento Casa</div>
 
@@ -107,21 +107,21 @@
 
                 <div class="member-name">{{ $member->full_name }}</div>
 
-                <div class="label-text">concluiu com aproveitamento a formacao</div>
+                <div class="label-text">concluiu com aproveitamento a formação</div>
 
                 <div class="formation-title">{{ $formation->title }}</div>
 
                 @if ($formation->ministry?->name)
-                    <div class="ministry-text">vinculada ao ministerio {{ $formation->ministry->name }}</div>
+                    <div class="ministry-text">vinculada ao ministério {{ $formation->ministry->name }}</div>
                 @endif
 
                 <div class="meta-block">
-                    Data de conclusao: {{ optional($progress->completed_at)->format('d/m/Y H:i') ?? '-' }}<br>
-                    Carga horaria: {{ $formation->workload_hours ? number_format((float) $formation->workload_hours, 2, ',', '.') . ' horas' : 'Nao informada' }}<br>
+                    Data de conclusão: {{ optional($progress->completed_at)->format('d/m/Y H:i') ?? '-' }}<br>
+                    Carga horária: {{ $formation->workload_hours ? number_format((float) $formation->workload_hours, 2, ',', '.') . ' horas' : 'Não informada' }}<br>
                     @if ($progress->quiz_score !== null)
                         Nota final: {{ number_format((float) $progress->quiz_score, 2, ',', '.') }}%<br>
                     @endif
-                    Codigo de autenticacao: {{ $certificateCode }}<br>
+                    Código de autenticação: {{ $certificateCode }}<br>
                     Emitido em: {{ $issuedAt->format('d/m/Y H:i') }}
                 </div>
             </div>

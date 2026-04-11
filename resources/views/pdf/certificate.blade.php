@@ -5,20 +5,14 @@
     <title>Certificado</title>
     <style>
         @page {
-            margin: 0;
+            margin: 10mm;
             size: A4 landscape;
         }
 
         * {
             box-sizing: border-box;
-        }
-
-        html, body {
             margin: 0;
             padding: 0;
-            width: 297mm;
-            height: 210mm;
-            overflow: hidden;
         }
 
         body {
@@ -27,212 +21,162 @@
             background: #fffdfb;
         }
 
+        /* Wrapper ocupa exatamente a area util da pagina (297 - 20mm x 210 - 20mm) */
         .page {
-            position: relative;
-            overflow: hidden;
-            width: 297mm;
-            height: 210mm;
-            padding: 14mm 20mm 10mm;
-            border: 2px solid #f4b8b8;
-            background: linear-gradient(180deg, #fffefe 0%, #fff9f9 100%);
-            page-break-inside: avoid;
-            page-break-after: avoid;
+            display: table;
+            width: 277mm;
+            height: 190mm;
+            border: 2.5px solid #e9b8b8;
         }
 
-        .content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
-
-        .safe-line {
-            position: absolute;
-            inset: 8px;
-            border: 1px dashed #ef4444;
-            opacity: 0.35;
-            z-index: 1;
-        }
-
-        .pattern {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-        }
-
-        .icon {
-            position: absolute;
-            color: #a1a1aa;
-            opacity: 0.28;
-        }
-
-        .icon svg {
-            display: block;
+        .page-inner {
+            display: table;
             width: 100%;
             height: 100%;
+            border: 1px solid #f4d0d0;
+            margin: 5px;
+            width: calc(100% - 10px);
+            height: calc(100% - 10px);
         }
 
-        .icon-book {
-            width: 38px;
-            height: 44px;
-        }
-
-        .icon-cross {
-            width: 36px;
-            height: 48px;
-        }
-
-        .icon-fish {
-            width: 52px;
-            height: 24px;
-        }
-
-        .icon-mountain {
-            width: 40px;
-            height: 32px;
-        }
-
-        .icon-church {
-            width: 50px;
-            height: 50px;
+        /* Celula central para alinhar verticalmente */
+        .content-cell {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 25mm;
         }
 
         .eyebrow {
-            font-size: 12px;
-            letter-spacing: 0.06em;
+            font-size: 10px;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #57534e;
+            color: #78716c;
             font-weight: 700;
-            margin-top: 8px;
+            margin-bottom: 4px;
         }
 
-        .title {
-            font-size: 28px;
+        .org-name {
+            font-size: 26px;
             font-weight: 700;
             color: #111827;
-            margin-top: 10px;
-            margin-bottom: 16px;
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
         }
 
-        .text {
-            font-size: 15px;
-            line-height: 1.4;
-            margin: 0;
-            color: #5b5560;
+        .divider {
+            width: 60mm;
+            height: 2px;
+            background: #e9b8b8;
+            margin: 8px auto;
+        }
+
+        .certifies-text {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 6px;
         }
 
         .member-name {
-            font-size: 40px;
-            line-height: 1.1;
+            font-size: 36px;
             font-weight: 700;
             color: #1657b8;
-            margin: 14px 0 12px;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .concluded-text {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 4px;
         }
 
         .formation-title {
-            font-size: 24px;
-            line-height: 1.2;
+            font-size: 20px;
             font-weight: 700;
-            margin: 8px 0 8px;
             color: #2d23b6;
+            line-height: 1.2;
+            margin-bottom: 4px;
         }
 
-        .meta {
-            margin-top: 16px;
+        .ministry-text {
             font-size: 11px;
-            line-height: 1.5;
-            color: #18181b;
+            color: #6b7280;
+            margin-bottom: 0;
         }
 
-        .meta-line {
-            margin: 0;
+        .divider-thin {
+            width: 80mm;
+            height: 1px;
+            background: #e5e7eb;
+            margin: 10px auto;
+        }
+
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .meta-table td {
+            font-size: 9px;
+            color: #374151;
+            padding: 1px 6px;
+            text-align: center;
+            line-height: 1.4;
         }
 
         .meta-label {
             font-weight: 700;
-        }
-
-        .ministry-line {
-            margin-top: 2px;
-        }
-
-        .top-logo {
-            width: 22px;
-            height: 26px;
-            margin: 0 auto 6px;
-            color: #a1a1aa;
-        }
-
-        .top-logo svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        .dot {
-            color: #71717a;
+            color: #111827;
         }
     </style>
 </head>
 <body>
     <div class="page">
-        <div class="safe-line"></div>
+        <div class="page-inner">
+            <div class="content-cell">
 
-        <div class="pattern">
-            <div class="icon icon-cross" style="top: 14px; left: 22px;">@include('pdf.partials.icons.cross')</div>
-            <div class="icon icon-fish" style="top: 42px; left: 190px;">@include('pdf.partials.icons.fish')</div>
-            <div class="icon icon-mountain" style="top: 16px; left: 420px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-book" style="top: 32px; left: 650px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-mountain" style="top: 20px; right: 120px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-cross" style="top: 14px; right: 20px;">@include('pdf.partials.icons.cross')</div>
+                <div class="eyebrow">Certificado de Conclusao</div>
 
-            <div class="icon icon-book" style="top: 110px; left: 30px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-mountain" style="top: 94px; left: 100px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-church" style="top: 150px; left: 132px;">@include('pdf.partials.icons.church')</div>
-            <div class="icon icon-cross" style="top: 110px; right: 108px;">@include('pdf.partials.icons.cross')</div>
-            <div class="icon icon-church" style="top: 132px; right: 18px;">@include('pdf.partials.icons.church')</div>
+                <div class="org-name">Movimento Casa</div>
 
-            <div class="icon icon-fish" style="top: 252px; left: 18px;">@include('pdf.partials.icons.fish')</div>
-            <div class="icon icon-book" style="top: 332px; left: 52px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-mountain" style="top: 418px; left: 110px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-cross" style="top: 470px; left: 122px;">@include('pdf.partials.icons.cross')</div>
-            <div class="icon icon-church" style="bottom: 12px; left: 10px;">@include('pdf.partials.icons.church')</div>
-            <div class="icon icon-book" style="bottom: 18px; left: 100px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-fish" style="bottom: 52px; left: 174px;">@include('pdf.partials.icons.fish')</div>
-            <div class="icon icon-mountain" style="bottom: 4px; left: 230px;">@include('pdf.partials.icons.mountain')</div>
+                <div class="divider"></div>
 
-            <div class="icon icon-book" style="top: 226px; right: 64px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-fish" style="top: 332px; right: 16px;">@include('pdf.partials.icons.fish')</div>
-            <div class="icon icon-mountain" style="top: 406px; right: 106px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-mountain" style="top: 404px; right: 18px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-cross" style="bottom: 42px; right: 170px;">@include('pdf.partials.icons.cross')</div>
-            <div class="icon icon-book" style="bottom: 28px; right: 96px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-church" style="bottom: 12px; right: 20px;">@include('pdf.partials.icons.church')</div>
-            <div class="icon icon-fish" style="bottom: 20px; right: 160px;">@include('pdf.partials.icons.fish')</div>
-        </div>
+                <p class="certifies-text">Certificamos que</p>
 
-        <div class="content">
-            <div class="top-logo">@include('pdf.partials.icons.book')</div>
-            <div class="eyebrow">Certificado de conclusao</div>
-            <div class="title">Movimento Casa</div>
+                <div class="member-name">{{ $member->full_name }}</div>
 
-            <p class="text">Certificamos que</p>
+                <p class="concluded-text">concluiu com aproveitamento a formacao</p>
 
-            <div class="member-name">{{ $member->full_name }}</div>
+                <div class="formation-title">{{ $formation->title }}</div>
 
-            <p class="text">concluiu com aproveitamento a formacao</p>
-
-            <div class="formation-title">{{ $formation->title }}</div>
-
-            <p class="text ministry-line">
                 @if ($formation->ministry?->name)
-                    vinculada ao ministerio {{ $formation->ministry->name }}
+                    <p class="ministry-text">vinculada ao ministerio <strong>{{ $formation->ministry->name }}</strong></p>
                 @endif
-            </p>
 
-            <div class="meta">
-                <p class="meta-line"><span class="meta-label">Data de conclusao:</span> {{ optional($progress->completed_at)->format('d/m/Y H:i') }}</p>
-                <p class="meta-line"><span class="meta-label">Carga horaria:</span> {{ $formation->workload_hours ? number_format((float) $formation->workload_hours, 2, ',', '.') . ' horas' : 'Nao informada' }}</p>
-                <p class="meta-line"><span class="meta-label">Codigo de autenticacao:</span> {{ $certificateCode }}</p>
-                <p class="meta-line"><span class="meta-label">Emitido em:</span> {{ $issuedAt->format('d/m/Y H:i') }}</p>
+                <div class="divider-thin"></div>
+
+                <table class="meta-table">
+                    <tr>
+                        <td>
+                            <span class="meta-label">Data de conclusao</span><br>
+                            {{ optional($progress->completed_at)->format('d/m/Y \a\s H:i') ?? '-' }}
+                        </td>
+                        <td>
+                            <span class="meta-label">Carga horaria</span><br>
+                            {{ $formation->workload_hours ? number_format((float) $formation->workload_hours, 0, ',', '.') . 'h' : 'Nao informada' }}
+                        </td>
+                        <td>
+                            <span class="meta-label">Codigo de autenticacao</span><br>
+                            {{ $certificateCode }}
+                        </td>
+                        <td>
+                            <span class="meta-label">Emitido em</span><br>
+                            {{ $issuedAt->format('d/m/Y \a\s H:i') }}
+                        </td>
+                    </tr>
+                </table>
+
             </div>
         </div>
     </div>

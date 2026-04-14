@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\FormationApprovalStatus;
 use App\Enums\FormationStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,6 +28,11 @@ class Formation extends Model
         'is_required',
         'is_general',
         'status',
+        'approval_status',
+        'approval_notes',
+        'reviewed_by',
+        'reviewed_at',
+        'submitted_for_review_at',
         'certificate_enabled',
         'quiz_enabled',
         'workload_hours',
@@ -38,14 +44,17 @@ class Formation extends Model
     protected function casts(): array
     {
         return [
-            'is_required' => 'boolean',
-            'is_general' => 'boolean',
-            'certificate_enabled' => 'boolean',
-            'quiz_enabled' => 'boolean',
-            'published_at' => 'datetime',
-            'minimum_score' => 'decimal:2',
-            'workload_hours' => 'decimal:2',
-            'status' => FormationStatus::class,
+            'is_required'              => 'boolean',
+            'is_general'               => 'boolean',
+            'certificate_enabled'      => 'boolean',
+            'quiz_enabled'             => 'boolean',
+            'published_at'             => 'datetime',
+            'reviewed_at'              => 'datetime',
+            'submitted_for_review_at'  => 'datetime',
+            'minimum_score'            => 'decimal:2',
+            'workload_hours'           => 'decimal:2',
+            'status'                   => FormationStatus::class,
+            'approval_status'          => FormationApprovalStatus::class,
         ];
     }
 
@@ -67,6 +76,11 @@ class Formation extends Model
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 
     public function lessons(): HasMany

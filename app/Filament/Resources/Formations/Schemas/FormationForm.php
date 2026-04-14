@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Formations\Schemas;
 
+use App\Enums\FormationApprovalStatus;
 use App\Enums\FormationStatus;
 use App\Enums\LessonSourceType;
 use App\Enums\QuestionType;
@@ -9,6 +10,7 @@ use App\Models\Ministry;
 use Asmit\FilamentUpload\Forms\Components\AdvancedFileUpload;
 use Asmit\FilamentUpload\Enums\PdfViewFit;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -26,10 +28,26 @@ class FormationForm
     {
         return $schema
             ->components([
+                Section::make('Feedback de Revisão')
+                    ->columnSpanFull()
+                    ->columns(1)
+                    ->visible(fn (Get $get): bool => $get('approval_status') === FormationApprovalStatus::NeedsRefinement->value)
+                    ->extraAttributes(['class' => 'border border-danger-300 bg-danger-50 dark:bg-danger-950 dark:border-danger-700'])
+                    ->schema([
+                        Textarea::make('approval_notes')
+                            ->label('Observações do revisor')
+                            ->readOnly()
+                            ->dehydrated(false)
+                            ->rows(4)
+                            ->columnSpanFull(),
+                    ]),
+
                 Section::make('Dados gerais')
                     ->columnSpanFull()
                     ->columns(6)
                     ->schema([
+                        Hidden::make('approval_status')
+                            ->dehydrated(false),
                         FileUpload::make('cover_image_path')
                             ->label('Capa')
                             ->image()
@@ -75,6 +93,7 @@ class FormationForm
                         Select::make('status')
                             ->label('Status')
                             ->options(collect(FormationStatus::cases())->mapWithKeys(fn (FormationStatus $status) => [$status->value => $status->label()]))
+                            ->default(FormationStatus::Draft->value)
                             ->required(),
 
                         Toggle::make('is_required')

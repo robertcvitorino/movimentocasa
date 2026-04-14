@@ -66,6 +66,7 @@ class FormationResource extends Resource
         return auth()->user()?->hasAnyRole([
             RoleName::SystemAdmin->value,
             RoleName::GeneralCoordinator->value,
+            RoleName::MinistryCoordinator->value,
         ]) ?? false;
     }
 }

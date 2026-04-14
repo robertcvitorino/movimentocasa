@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Formations\Tables;
 
+use App\Enums\FormationApprovalStatus;
 use App\Enums\FormationProgressStatus;
 use App\Enums\FormationStatus;
 use Filament\Actions\BulkActionGroup;
@@ -29,6 +30,32 @@ class FormationsTable
                     ->searchable()
                     ->placeholder('-')
                     ->toggleable(),
+
+                TextColumn::make('approval_status')
+                    ->label('Aprovação')
+                    ->formatStateUsing(
+                        fn (FormationApprovalStatus|string|null $state): string => match (true) {
+                            $state instanceof FormationApprovalStatus => $state->label(),
+                            is_string($state) => FormationApprovalStatus::tryFrom($state)?->label() ?? $state,
+                            default => '-',
+                        }
+                    )
+                    ->color(
+                        fn (FormationApprovalStatus|string|null $state): string => match (true) {
+                            $state instanceof FormationApprovalStatus => $state->color(),
+                            is_string($state) => FormationApprovalStatus::tryFrom($state)?->color() ?? 'gray',
+                            default => 'gray',
+                        }
+                    )
+                    ->icon(
+                        fn (FormationApprovalStatus|string|null $state): ?string => match (true) {
+                            $state instanceof FormationApprovalStatus => $state->icon(),
+                            is_string($state) => FormationApprovalStatus::tryFrom($state)?->icon(),
+                            default => null,
+                        }
+                    )
+                    ->badge()
+                    ->placeholder('-'),
 
                 TextColumn::make('status')
                     ->label('Status')

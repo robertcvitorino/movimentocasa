@@ -86,12 +86,6 @@ class FormationsTable
                     ->placeholder('-')
                     ->sortable(),
 
-                TextColumn::make('lessons_count')
-                    ->label('Aulas')
-                    ->counts('activeLessons')
-                    ->icon('heroicon-o-play-circle')
-                    ->iconColor('primary'),
-
                 TextColumn::make('completions_count')
                     ->label('Progresso')
                     ->badge()

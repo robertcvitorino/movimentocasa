@@ -6,6 +6,7 @@ use App\Enums\RoleName;
 use App\Filament\Resources\Formations\Pages\CreateFormation;
 use App\Filament\Resources\Formations\Pages\EditFormation;
 use App\Filament\Resources\Formations\Pages\ListFormations;
+use App\Filament\Resources\Formations\RelationManagers\QuizAttemptsRelationManager;
 use App\Filament\Resources\Formations\Schemas\FormationForm;
 use App\Filament\Resources\Formations\Tables\FormationsTable;
 use App\Models\Formation;
@@ -41,7 +42,7 @@ class FormationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            QuizAttemptsRelationManager::class,
         ];
     }
 

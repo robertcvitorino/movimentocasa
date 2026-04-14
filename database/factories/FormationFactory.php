@@ -25,6 +25,7 @@ class FormationFactory extends Factory
             'is_required' => fake()->boolean(),
             'status' => fake()->randomElement(FormationStatus::cases()),
             'certificate_enabled' => true,
+            'quiz_enabled' => false,
             'workload_hours' => fake()->randomFloat(1, 1, 20),
             'published_at' => now(),
         ];

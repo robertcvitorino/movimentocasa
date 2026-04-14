@@ -85,13 +85,10 @@ class FormationForm
                             ->inline(false)
                             ->label('Gera certificado?'),
 
-//                        RichEditor::make('full_description')
-//                            ->label('Descricao')
-//                            ->extraInputAttributes([
-//                                'style' => 'min-height: 6rem;',
-//                            ])
-//                            ->columnSpanFull(),
-
+                        Toggle::make('quiz_enabled')
+                            ->label('Habilitar Quiz')
+                            ->inline(false)
+                            ->live(),
 
                     ]),
                 Section::make('Video aulas')
@@ -168,11 +165,6 @@ class FormationForm
                                     ->label('Ativa')
                                     ->default(true),
 
-//                                Textarea::make('description')
-//                                    ->label('Descricao')
-//                                    ->rows(3)
-//                                    ->columnSpanFull(),
-
                                 RichEditor::make('support_text')
                                     ->label('Texto de apoio da etapa')
                                     ->columnSpanFull()
@@ -209,21 +201,15 @@ class FormationForm
                     ->relationship('quiz')
                     ->columns(4)
                     ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => (bool) $get('quiz_enabled'))
                     ->schema([
                         TextInput::make('title')
                             ->label('Titulo do quiz')
-                            ->disabled(fn (Get $get): bool => $get('is_active') === false)
                             ->dehydrated()
                             ->default('Quiz final'),
-                        TextInput::make('minimum_score')
-                            ->label('Nota minima')
-                            ->numeric()
-                            ->disabled(fn (Get $get): bool => $get('is_active') === false)
-                            ->default(70),
                         TextInput::make('max_attempts')
                             ->label('Tentativas maximas')
                             ->numeric()
-                            ->disabled(fn (Get $get): bool => $get('is_active') === false)
                             ->default(3),
                         Toggle::make('is_active')
                             ->label('Quiz ativo')
@@ -248,10 +234,6 @@ class FormationForm
                                     ->options(collect(QuestionType::cases())->mapWithKeys(fn (QuestionType $type) => [$type->value => $type->label()]))
                                     ->default(QuestionType::MultipleChoice->value)
                                     ->required(),
-                                TextInput::make('weight')
-                                    ->label('Peso')
-                                    ->numeric()
-                                    ->default(1),
                                 TextInput::make('display_order')
                                     ->label('Ordem')
                                     ->numeric()
@@ -264,15 +246,44 @@ class FormationForm
                                     ->label('Alternativas')
                                     ->minItems(2)
                                     ->defaultItems(2)
+                                    ->reorderableWithButtons()
+                                    ->afterStateHydrated(function (?array $state, Set $set): void {
+                                        $normalized = self::normalizeRepeaterDisplayOrder($state ?? []);
+                                        if (($state ?? []) !== $normalized) {
+                                            $set('options', $normalized);
+                                        }
+                                    })
+                                    ->afterStateUpdated(function (?array $state, Set $set): void {
+                                        $normalized = self::normalizeRepeaterDisplayOrder($state ?? []);
+                                        if (($state ?? []) !== $normalized) {
+                                            $set('options', $normalized);
+                                        }
+                                    })
                                     ->schema([
                                         TextInput::make('label')
                                             ->label('Texto')
                                             ->required(),
                                         Toggle::make('is_correct')
-                                            ->label('Correta'),
+                                            ->label('Correta')
+                                            ->live()
+                                            ->afterStateUpdated(function (bool $state, Get $get, Set $set): void {
+                                                if (! $state) {
+                                                    return;
+                                                }
+                                                // Garante apenas uma alternativa correta por pergunta
+                                                $options = $get('../../options') ?? [];
+                                                $currentKey = $get('../../options');
+                                                foreach ($options as $key => $option) {
+                                                    if (($option['is_correct'] ?? false) && $key !== array_key_last($options)) {
+                                                        $set("../../options.{$key}.is_correct", false);
+                                                    }
+                                                }
+                                            }),
                                         TextInput::make('display_order')
                                             ->label('Ordem')
                                             ->numeric()
+                                            ->readOnly()
+                                            ->dehydrated()
                                             ->default(1),
                                     ])
                                     ->columns(3)
@@ -280,8 +291,7 @@ class FormationForm
                             ])
                             ->columns(4)
                             ->columnSpanFull(),
-                    ])
-                  ,
+                    ]),
             ]);
     }
 

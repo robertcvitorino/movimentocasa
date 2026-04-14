@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Formation extends Model
@@ -26,6 +27,7 @@ class Formation extends Model
         'is_required',
         'status',
         'certificate_enabled',
+        'quiz_enabled',
         'workload_hours',
         'published_at',
         'created_by',
@@ -37,6 +39,7 @@ class Formation extends Model
         return [
             'is_required' => 'boolean',
             'certificate_enabled' => 'boolean',
+            'quiz_enabled' => 'boolean',
             'published_at' => 'datetime',
             'minimum_score' => 'decimal:2',
             'workload_hours' => 'decimal:2',
@@ -89,6 +92,11 @@ class Formation extends Model
     public function certificates(): HasMany
     {
         return $this->hasMany(Certificate::class);
+    }
+
+    public function quizAttempts(): HasManyThrough
+    {
+        return $this->hasManyThrough(QuizAttempt::class, Quiz::class);
     }
 
     protected function lessonsCountLabel(): Attribute

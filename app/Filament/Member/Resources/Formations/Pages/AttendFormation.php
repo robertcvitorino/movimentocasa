@@ -4,6 +4,7 @@ namespace App\Filament\Member\Resources\Formations\Pages;
 
 use App\Actions\Formation\CompleteFormationLessonAction;
 use App\Actions\Formation\EnsureFormationProgressAction;
+use App\Actions\Formation\IssueCertificateAction;
 use App\Actions\Formation\SubmitQuizAttemptAction;
 use App\Filament\Member\Resources\Formations\FormationResource;
 use App\Models\Formation;
@@ -46,12 +47,25 @@ class AttendFormation extends Page implements HasForms
 
     public ?MemberFormationProgress $progress = null;
 
+    /** Controla se o quiz já foi enviado nesta sessão (fase 1 concluída) */
+    public bool $quizSubmitted = false;
+
+    /** Nota obtida no último envio do quiz */
+    public ?float $lastAttemptScore = null;
+
+    /** Número total de tentativas do membro nesta formação */
+    public int $attemptCount = 0;
+
+    /** Indica que o limite de tentativas foi atingido */
+    public bool $attemptLimitReached = false;
+
     public function mount(int | string $record): void
     {
         $this->record = $this->resolveRecord($record);
         abort_unless(static::getResource()::canView($this->getRecord()), 403);
 
         $this->loadProgress();
+        $this->syncAttemptState();
         $this->form->fill([
             'quiz_answers' => [],
         ]);
@@ -67,11 +81,11 @@ class AttendFormation extends Page implements HasForms
         return $schema
             ->statePath('data')
             ->components([
-                Section::make('Resumo da formacao')
+                Section::make('Resumo da formação')
                     ->schema([
-                        Text::make(fn (): string => 'Ministerio: ' . ($this->getRecord()->ministry?->name ?: '-'))->color('primary'),
+                        Text::make(fn (): string => 'Ministério: ' . ($this->getRecord()->ministry?->name ?: '-'))->color('primary'),
                         Text::make(fn (): string => 'Progresso: ' . ($this->progress?->progress_percentage ?? 0) . '%')->color('secondary'),
-                        Text::make(fn (): string => 'Status: ' . ($this->progress?->status?->label() ?? 'Nao iniciada'))->color('danger'),
+                        Text::make(fn (): string => 'Status: ' . ($this->progress?->status?->label() ?? 'Não iniciada'))->color('danger'),
                     ])
                     ->extraAttributes([
                         'class' => 'py-2',
@@ -128,12 +142,12 @@ class AttendFormation extends Page implements HasForms
                 ->description('Responda ao quiz para acompanhar seu desempenho.')
                 ->schema($this->getQuizSchema());
         } else {
-            $steps[] = Step::make('Conclusao')
+            $steps[] = Step::make('Conclusão')
                 ->id('completion')
                 ->key('completion')
-                ->description('Finalize para gerar o certificado da formacao.')
+                ->description('Finalize para gerar o certificado da formação.')
                 ->schema([
-                    Text::make('Clique em "Gerar certificado" para concluir a formacao.')
+                    Text::make('Clique em "Gerar certificado" para concluir a formação.')
                         ->color('success'),
                 ]);
         }
@@ -154,7 +168,7 @@ class AttendFormation extends Page implements HasForms
                 ])
                 ->columnSpanFull(),
             Section::make($lesson->title)
-                ->description('Assista ao video e leia o conteudo de apoio para concluir esta etapa.')
+                ->description('Assista ao vídeo e leia o conteúdo de apoio para concluir esta etapa.')
                 ->schema([
                     View::make('filament.member.resources.formations.components.lesson-support-content')
                         ->viewData([
@@ -191,15 +205,55 @@ class AttendFormation extends Page implements HasForms
 
         if (! $quiz) {
             return [
-                Radio::make('quiz_unavailable')
-                    ->label('Nao ha quiz configurado para esta formacao.')
-                    ->disabled(),
+                Text::make('Não há quiz configurado para esta formação.')
+                    ->color('warning'),
             ];
         }
 
-        return $quiz->questions
+        // Limite de tentativas atingido: exibe aviso + nota anterior
+        if ($this->attemptLimitReached) {
+            $components = [
+                Text::make(
+                    '⚠️ Você atingiu o limite de ' . $quiz->max_attempts . ' tentativa(s) para este quiz.'
+                )->color('warning'),
+            ];
+
+            if ($this->lastAttemptScore !== null) {
+                $components[] = Text::make(
+                    'Sua última nota: ' . number_format($this->lastAttemptScore, 2, ',', '.') . '%'
+                )->color('secondary');
+            }
+
+            $components[] = Text::make('Clique em "Gerar certificado" para concluir a formação.')
+                ->color('success');
+
+            return $components;
+        }
+
+        // Quiz já enviado nesta sessão: exibe resultado + botão de certificado
+        if ($this->quizSubmitted) {
+            return [
+                Text::make(
+                    '✅ Quiz enviado! Sua nota: ' . number_format((float) ($this->lastAttemptScore ?? 0), 2, ',', '.') . '%'
+                )->color('success'),
+                Text::make('Clique em "Gerar certificado" para concluir a formação.')
+                    ->color('secondary'),
+            ];
+        }
+
+        // Exibe as perguntas do quiz
+        $questions = $quiz->questions
             ->where('is_active', true)
-            ->sortBy('display_order')
+            ->sortBy('display_order');
+
+        if ($questions->isEmpty()) {
+            return [
+                Text::make('Não há perguntas disponíveis neste quiz.')
+                    ->color('warning'),
+            ];
+        }
+
+        return $questions
             ->map(fn ($question) => Radio::make('quiz_answers.' . $question->getKey())
                 ->label($question->display_order . '. ' . $question->statement)
                 ->options(
@@ -236,29 +290,19 @@ class AttendFormation extends Page implements HasForms
 
     public function submit(): void
     {
-        $quiz = $this->getRecord()->quiz;
-
         if (! $this->progress) {
             abort(403);
         }
 
-        if (! $quiz || ! $quiz->is_active) {
-            $this->loadProgress();
+        $quiz = $this->getRecord()->quiz;
 
-            if ($this->progress->status === \App\Enums\FormationProgressStatus::Completed && $this->getRecord()->certificate_enabled) {
-                app(\App\Actions\Formation\IssueCertificateAction::class)->execute($this->progress);
-            }
-
-            Notification::make()
-                ->title('Formacao concluida')
-                ->success()
-                ->send();
-
-            $this->redirect(FormationResource::getUrl(), navigate: true);
-
+        // Sem quiz ativo ou quiz já enviado/limite atingido: gera certificado
+        if (! $this->hasActiveQuiz() || $this->quizSubmitted || $this->attemptLimitReached) {
+            $this->issueCertificateAndRedirect();
             return;
         }
 
+        // Fase 1: enviar quiz
         $state = $this->form->getState();
 
         try {
@@ -266,25 +310,65 @@ class AttendFormation extends Page implements HasForms
                 $this->progress,
                 $state['quiz_answers'] ?? [],
             );
-        } catch (ValidationException $exception) {
+
+            $this->lastAttemptScore = (float) $attempt->score;
+            $this->quizSubmitted = true;
+            $this->attemptCount++;
+
+            $this->loadProgress();
+
             Notification::make()
-                ->title('Nao foi possivel enviar o quiz')
-                ->body(collect($exception->errors())->flatten()->implode(' '))
+                ->title('Quiz enviado!')
+                ->body('Sua nota: ' . number_format($this->lastAttemptScore, 2, ',', '.') . '%')
+                ->success()
+                ->send();
+
+        } catch (ValidationException $exception) {
+            $errors = $exception->errors();
+
+            // Limite de tentativas atingido: informa mas permite gerar certificado
+            if (isset($errors['limit_reached'])) {
+                $this->attemptLimitReached = true;
+                $this->loadProgress();
+
+                $lastAttempt = $this->progress?->quizAttempts()
+                    ->latest('submitted_at')
+                    ->first();
+
+                $this->lastAttemptScore = $lastAttempt ? (float) $lastAttempt->score : null;
+
+                Notification::make()
+                    ->title('Limite de tentativas atingido')
+                    ->body(collect($errors)->except('limit_reached')->flatten()->implode(' '))
+                    ->warning()
+                    ->send();
+
+                return;
+            }
+
+            Notification::make()
+                ->title('Não foi possível enviar o quiz')
+                ->body(collect($errors)->flatten()->implode(' '))
                 ->danger()
                 ->send();
 
             throw $exception;
         }
+    }
 
+    protected function issueCertificateAndRedirect(): void
+    {
         $this->loadProgress();
 
+        if (
+            $this->progress->status === \App\Enums\FormationProgressStatus::Completed
+            && $this->getRecord()->certificate_enabled
+        ) {
+            app(IssueCertificateAction::class)->execute($this->progress);
+        }
+
         Notification::make()
-            ->title('Quiz enviado')
-            ->body(
-                $this->progress->status === \App\Enums\FormationProgressStatus::Completed && $this->getRecord()->certificate_enabled
-                    ? 'Quiz enviado com sucesso. Certificado emitido com sucesso.'
-                    : 'Quiz enviado com sucesso.'
-            )
+            ->title('Formação concluída!')
             ->success()
             ->send();
 
@@ -305,6 +389,26 @@ class AttendFormation extends Page implements HasForms
                 'progress.lessonProgress',
             ])
         );
+    }
+
+    protected function syncAttemptState(): void
+    {
+        if (! $this->hasActiveQuiz() || ! $this->progress) {
+            return;
+        }
+
+        $quiz = $this->getRecord()->quiz;
+        $this->attemptCount = $this->progress->quizAttempts()->count();
+
+        if ($quiz && $quiz->max_attempts > 0 && $this->attemptCount >= $quiz->max_attempts) {
+            $this->attemptLimitReached = true;
+
+            $lastAttempt = $this->progress->quizAttempts()
+                ->latest('submitted_at')
+                ->first();
+
+            $this->lastAttemptScore = $lastAttempt ? (float) $lastAttempt->score : null;
+        }
     }
 
     public function getLessons(): Collection
@@ -334,7 +438,7 @@ class AttendFormation extends Page implements HasForms
         $this->loadProgress();
 
         Notification::make()
-            ->title('Aula concluida')
+            ->title('Aula concluída')
             ->success()
             ->send();
     }
@@ -392,7 +496,11 @@ class AttendFormation extends Page implements HasForms
 
     protected function getWizardSubmitAction(): Htmlable
     {
-        $buttonLabel = $this->hasActiveQuiz() ? 'Enviar quiz' : 'Gerar certificado';
+        $showCertificateButton = ! $this->hasActiveQuiz()
+            || $this->quizSubmitted
+            || $this->attemptLimitReached;
+
+        $buttonLabel = $showCertificateButton ? 'Gerar certificado' : 'Enviar quiz';
 
         return new HtmlString(Blade::render(<<<'BLADE'
             <x-filament::button type="submit" size="lg" x-on:click="window.pauseFormationMedia?.()">
@@ -403,6 +511,18 @@ class AttendFormation extends Page implements HasForms
 
     protected function hasActiveQuiz(): bool
     {
-        return (bool) $this->getRecord()->quiz?->is_active;
+        $record = $this->getRecord();
+
+        if (! $record->quiz_enabled) {
+            return false;
+        }
+
+        $quiz = $record->quiz;
+
+        if (! $quiz || ! $quiz->is_active) {
+            return false;
+        }
+
+        return $quiz->questions->where('is_active', true)->isNotEmpty();
     }
 }

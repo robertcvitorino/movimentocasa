@@ -20,44 +20,55 @@ class SubmitQuizAttemptAction
 
         if (! $quiz || ! $quiz->is_active) {
             throw ValidationException::withMessages([
-                'quiz' => 'Nao ha quiz ativo para esta formacao.',
+                'quiz' => 'Não há quiz ativo para esta formação.',
             ]);
         }
 
-        return DB::transaction(function () use ($formation, $progress, $quiz, $answers): QuizAttempt {
+        $attemptCount = $progress->quizAttempts()->count();
+
+        if ($quiz->max_attempts > 0 && $attemptCount >= $quiz->max_attempts) {
+            throw ValidationException::withMessages([
+                'quiz' => "Você atingiu o limite de {$quiz->max_attempts} tentativa(s) para este quiz.",
+                'limit_reached' => true,
+            ]);
+        }
+
+        return DB::transaction(function () use ($formation, $progress, $quiz, $answers, $attemptCount): QuizAttempt {
             $attempt = $progress->quizAttempts()->create([
                 'quiz_id' => $quiz->getKey(),
                 'member_id' => $progress->member_id,
-                'attempt_number' => $progress->quizAttempts()->count() + 1,
+                'attempt_number' => $attemptCount + 1,
                 'status' => QuizAttemptStatus::InProgress,
                 'started_at' => now(),
             ]);
 
-            $totalWeight = 0.0;
-            $earnedWeight = 0.0;
+            $activeQuestions = $quiz->questions->where('is_active', true);
+            $totalQuestions = $activeQuestions->count();
+            $correctCount = 0;
 
-            foreach ($quiz->questions->where('is_active', true) as $question) {
+            foreach ($activeQuestions as $question) {
                 $selectedOptionId = $answers[$question->getKey()] ?? null;
                 $selectedOption = $question->options->firstWhere('id', (int) $selectedOptionId);
                 $isCorrect = (bool) ($selectedOption?->is_correct ?? false);
-                $weight = (float) $question->weight;
 
-                $totalWeight += $weight;
-                $earnedWeight += $isCorrect ? $weight : 0;
+                if ($isCorrect) {
+                    $correctCount++;
+                }
 
                 $attempt->answers()->create([
                     'quiz_question_id' => $question->getKey(),
                     'quiz_option_id' => $selectedOption?->getKey(),
                     'is_correct' => $isCorrect,
-                    'score_earned' => $isCorrect ? $weight : 0,
+                    'score_earned' => $isCorrect ? 1 : 0,
                 ]);
             }
 
-            $score = $totalWeight > 0 ? round(($earnedWeight / $totalWeight) * 100, 2) : 0;
-            $passed = $score >= (float) $quiz->minimum_score;
+            $score = $totalQuestions > 0
+                ? round(($correctCount / $totalQuestions) * 100, 2)
+                : 0;
 
             $attempt->forceFill([
-                'status' => $passed ? QuizAttemptStatus::Passed : QuizAttemptStatus::Failed,
+                'status' => QuizAttemptStatus::Passed,
                 'score' => $score,
                 'submitted_at' => now(),
                 'finished_at' => now(),
@@ -65,7 +76,7 @@ class SubmitQuizAttemptAction
 
             $progress->forceFill([
                 'quiz_score' => $score,
-                'quiz_passed_at' => $passed ? now() : null,
+                'quiz_passed_at' => now(),
             ])->save();
 
             $progress = app(SyncFormationProgressAction::class)->execute($progress);

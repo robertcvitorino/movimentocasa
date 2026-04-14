@@ -6,21 +6,19 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         $this->call([
+            // 1. Permissões e roles (Shield)
             ShieldSeeder::class,
-            SacramentalTitleSeeder::class,
-            MinistrySeeder::class,
-            MemberSeeder::class,
-            PixSettingSeeder::class,
-            FormationSeeder::class,
-            FinancialGoalSeeder::class,
-            MemberContributionSeeder::class,
-            MemberJourneySeeder::class,
+
+            // 2. Super Admin
+            SuperAdminSeeder::class,
+
+            // 3. Ministérios — um seeder por ministério
+            MinistryAcolhidaSeeder::class,
+            MinistryLouvorSeeder::class,
+            MinistryFormacaoSeeder::class,
         ]);
     }
 }

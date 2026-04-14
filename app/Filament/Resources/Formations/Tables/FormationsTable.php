@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Formations\Tables;
 
+use App\Enums\FormationProgressStatus;
 use App\Enums\FormationStatus;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -20,10 +21,13 @@ class FormationsTable
                 TextColumn::make('title')
                     ->label('Titulo')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('bold'),
+
                 TextColumn::make('ministry.name')
                     ->label('Ministerio')
                     ->searchable()
+                    ->placeholder('-')
                     ->toggleable(),
 
                 TextColumn::make('status')
@@ -52,16 +56,60 @@ class FormationsTable
                     ->badge(),
 
                 IconColumn::make('is_required')
-                    ->label('Obrigatoria')
-                    ->boolean(),
+                    ->label('Obrigatória')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-exclamation-circle')
+                    ->falseIcon('heroicon-o-minus-circle')
+                    ->trueColor('warning')
+                    ->falseColor('gray'),
 
                 IconColumn::make('certificate_enabled')
                     ->label('Certificado')
-                    ->boolean(),
-                IconColumn::make('has_quiz')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-academic-cap')
+                    ->falseIcon('heroicon-o-minus-circle')
+                    ->trueColor('success')
+                    ->falseColor('gray'),
+
+                IconColumn::make('quiz_enabled')
                     ->label('Quiz')
                     ->boolean()
-                    ->state(fn ($record): bool => $record->quiz()->exists()),
+                    ->trueIcon('heroicon-o-clipboard-document-list')
+                    ->falseIcon('heroicon-o-minus-circle')
+                    ->trueColor('info')
+                    ->falseColor('gray'),
+
+                TextColumn::make('workload_hours')
+                    ->label('Carga Horária')
+                    ->suffix('h')
+                    ->numeric(decimalPlaces: 0)
+                    ->placeholder('-')
+                    ->sortable(),
+
+                TextColumn::make('lessons_count')
+                    ->label('Aulas')
+                    ->counts('activeLessons')
+                    ->icon('heroicon-o-play-circle')
+                    ->iconColor('primary'),
+
+                TextColumn::make('completions_count')
+                    ->label('Progresso')
+                    ->badge()
+                    ->icon('heroicon-o-users')
+                    ->color('success')
+                    ->state(function ($record): string {
+                        $total = $record->progress()->count();
+                        $completed = $record->progress()
+                            ->where('status', FormationProgressStatus::Completed->value)
+                            ->count();
+
+                        if ($total === 0) {
+                            return 'Sem membros';
+                        }
+
+                        return "{$completed}/{$total} concluíram";
+                    })
+                    ->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('status')

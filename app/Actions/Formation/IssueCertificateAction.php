@@ -4,6 +4,7 @@ namespace App\Actions\Formation;
 
 use App\Models\Certificate;
 use App\Models\MemberFormationProgress;
+use App\Services\QrCodeService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -11,10 +12,14 @@ use Illuminate\Support\Str;
 
 class IssueCertificateAction
 {
+    public function __construct(
+        protected QrCodeService $qrCodeService,
+    ) {}
+
     public function execute(MemberFormationProgress $progress): Certificate
     {
         return DB::transaction(function () use ($progress): Certificate {
-            $progress->loadMissing(['member', 'formation.ministry', 'certificate']);
+            $progress->load(['member', 'formation.ministry', 'certificate']);
 
             if ($progress->certificate) {
                 return $progress->certificate;
@@ -28,13 +33,17 @@ class IssueCertificateAction
                 Str::slug($certificateCode),
             );
 
+            $verificationUrl = route('certificate.verify', $certificateCode);
+            $qrCodeDataUri = $this->qrCodeService->generateBase64Png($verificationUrl);
+
             $pdf = Pdf::loadView('pdf.certificate', [
                 'certificateCode' => $certificateCode,
                 'issuedAt' => $issuedAt,
                 'member' => $progress->member,
                 'formation' => $progress->formation,
                 'progress' => $progress,
-            ])->setPaper('a4', 'landscape');
+                'qrCodeDataUri' => $qrCodeDataUri,
+            ])->setPaper('a4', 'portrait');
 
             Storage::disk('public')->put($filePath, $pdf->output());
 
@@ -45,12 +54,14 @@ class IssueCertificateAction
                 'certificate_code' => $certificateCode,
                 'issued_at' => $issuedAt,
                 'pdf_path' => $filePath,
-                'verification_hash' => hash('sha256', $certificateCode . '|' . Str::uuid()),
+                'verification_hash' => hash('sha256', $certificateCode.'|'.Str::uuid()),
             ]);
 
             $progress->forceFill([
                 'certificate_issued_at' => $issuedAt,
             ])->save();
+
+            $progress->setRelation('certificate', $certificate);
 
             return $certificate;
         });
@@ -59,7 +70,7 @@ class IssueCertificateAction
     protected function generateCertificateCode(): string
     {
         do {
-            $code = 'CERT-' . now()->format('Ymd') . '-' . Str::upper(Str::random(8));
+            $code = 'CERT-'.now()->format('Ymd').'-'.Str::upper(Str::random(8));
         } while (Certificate::query()->where('certificate_code', $code)->exists());
 
         return $code;

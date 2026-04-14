@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c7ee23975fff1ca2b97a49893483972e",
+    "content-hash": "572e73530450de6675e75a392b53046f",
     "packages": [
         {
             "name": "asmit/filament-upload",

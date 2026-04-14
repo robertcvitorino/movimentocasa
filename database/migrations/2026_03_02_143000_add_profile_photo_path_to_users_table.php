@@ -17,13 +17,21 @@ return new class extends Migration
             return;
         }
 
-        DB::table('users')
-            ->join('members', 'members.user_id', '=', 'users.id')
-            ->whereNull('users.profile_photo_path')
-            ->whereNotNull('members.profile_photo_path')
-            ->update([
-                'users.profile_photo_path' => DB::raw('members.profile_photo_path'),
-            ]);
+        DB::statement('
+            UPDATE users
+            SET profile_photo_path = (
+                SELECT members.profile_photo_path
+                FROM members
+                WHERE members.user_id = users.id
+                  AND members.profile_photo_path IS NOT NULL
+            )
+            WHERE profile_photo_path IS NULL
+              AND EXISTS (
+                SELECT 1 FROM members
+                WHERE members.user_id = users.id
+                  AND members.profile_photo_path IS NOT NULL
+            )
+        ');
     }
 
     public function down(): void

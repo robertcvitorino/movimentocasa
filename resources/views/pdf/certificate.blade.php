@@ -5,56 +5,41 @@
     <title>Certificado</title>
     <style>
         @page {
-            margin: 8mm;
-            size: A4 landscape;
+            margin: 0;
+            size: 210mm 297mm;
         }
 
         * {
-            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             font-family: DejaVu Sans, sans-serif;
             color: #3f3f46;
-            margin: 0;
-            padding: 0;
-            background: #fffdfb;
+            background: #ffffff;
         }
 
         .page {
             position: relative;
+            width: 210mm;
+            height: 297mm;
             overflow: hidden;
-            min-height: 190mm;
-            width: 100%;
-            padding: 18mm 20mm 14mm;
-            border: 2px solid #f4b8b8;
-            background: linear-gradient(180deg, #fffefe 0%, #fff9f9 100%);
         }
 
-        .content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
-
-        .safe-line {
+        .border-frame {
             position: absolute;
-            inset: 8px;
-            border: 1px dashed #ef4444;
-            opacity: 0.35;
-            z-index: 1;
-        }
-
-        .pattern {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
+            top: 8mm;
+            left: 8mm;
+            right: 8mm;
+            bottom: 8mm;
+            border: 2px solid #d1d5db;
         }
 
         .icon {
             position: absolute;
-            color: #a1a1aa;
-            opacity: 0.28;
+            color: #c4c4cc;
+            opacity: 0.18;
         }
 
         .icon svg {
@@ -63,76 +48,124 @@
             height: 100%;
         }
 
-        .icon-book {
-            width: 38px;
-            height: 44px;
+        .icon-sm { width: 24px; height: 24px; }
+        .icon-md { width: 30px; height: 30px; }
+
+        .center-block {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 210mm;
+            height: 297mm;
+            text-align: center;
         }
 
-        .icon-cross {
-            width: 36px;
-            height: 48px;
+        .top-logo {
+            margin-top: 28mm;
+            display: inline-block;
+            width: 24px;
+            height: 28px;
+            color: #9ca3af;
         }
 
-        .icon-fish {
-            width: 52px;
-            height: 24px;
-        }
-
-        .icon-mountain {
-            width: 40px;
-            height: 32px;
-        }
-
-        .icon-church {
-            width: 50px;
-            height: 50px;
+        .top-logo svg {
+            width: 100%;
+            height: 100%;
         }
 
         .eyebrow {
-            font-size: 13px;
-            letter-spacing: 0.06em;
+            font-size: 11px;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
             color: #57534e;
             font-weight: 700;
-            margin-top: 16px;
+            margin-top: 6mm;
         }
 
         .title {
-            font-size: 31px;
+            font-size: 30px;
             font-weight: 700;
             color: #111827;
-            margin-top: 18px;
-            margin-bottom: 28px;
+            margin-top: 5mm;
+        }
+
+        .separator {
+            display: block;
+            width: 60px;
+            height: 2px;
+            background: #d1d5db;
+            margin: 6mm auto;
+            border: none;
         }
 
         .text {
-            font-size: 16px;
-            line-height: 1.45;
-            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
             color: #5b5560;
         }
 
         .member-name {
-            font-size: 46px;
-            line-height: 1.08;
+            font-size: 34px;
+            line-height: 1.1;
             font-weight: 700;
-            color: #1657b8;
-            margin: 28px 0 24px;
+            color: #111827;
+            margin-top: 7mm;
+            padding: 0 20mm;
+            word-wrap: break-word;
+        }
+
+        .text-after-name {
+            margin-top: 7mm;
         }
 
         .formation-title {
-            font-size: 28px;
+            font-size: 22px;
             line-height: 1.15;
             font-weight: 700;
-            margin: 10px 0 12px;
-            color: #2d23b6;
+            color: #1657b8;
+            margin-top: 4mm;
+            padding: 0 20mm;
+            word-wrap: break-word;
+        }
+
+        .ministry-line {
+            margin-top: 3mm;
+            font-size: 13px;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .meta-area {
+            position: absolute;
+            bottom: 18mm;
+            left: 20mm;
+            right: 20mm;
+        }
+
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .meta-table td {
+            vertical-align: middle;
+            padding: 0;
+        }
+
+        .qr-td {
+            width: 82px;
+            padding-right: 5mm;
+        }
+
+        .qr-td img {
+            width: 82px;
+            height: 82px;
         }
 
         .meta {
-            margin-top: 32px;
-            font-size: 12px;
-            line-height: 1.35;
-            color: #18181b;
+            font-size: 10px;
+            line-height: 1.7;
+            color: #374151;
         }
 
         .meta-line {
@@ -142,91 +175,83 @@
         .meta-label {
             font-weight: 700;
         }
-
-        .ministry-line {
-            margin-top: 2px;
-        }
-
-        .top-logo {
-            width: 24px;
-            height: 28px;
-            margin: 0 auto 10px;
-            color: #a1a1aa;
-        }
-
-        .top-logo svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        .dot {
-            color: #71717a;
-        }
     </style>
 </head>
 <body>
-    <div class="page">
-        <div class="safe-line"></div>
+<div class="page">
+    {{-- Decorative border --}}
+    <div class="border-frame"></div>
 
-        <div class="pattern">
-            <div class="icon icon-cross" style="top: 14px; left: 22px;">@include('pdf.partials.icons.cross')</div>
-            <div class="icon icon-fish" style="top: 42px; left: 190px;">@include('pdf.partials.icons.fish')</div>
-            <div class="icon icon-mountain" style="top: 16px; left: 420px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-book" style="top: 32px; left: 650px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-mountain" style="top: 20px; right: 120px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-cross" style="top: 14px; right: 20px;">@include('pdf.partials.icons.cross')</div>
+    {{-- Background decorative icons --}}
+    <div class="icon icon-md" style="position: absolute; top: 14mm; left: 14mm;">@include('pdf.partials.icons.cross')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 18mm; left: 55mm;">@include('pdf.partials.icons.fish')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 14mm; left: 105mm;">@include('pdf.partials.icons.mountain')</div>
+    <div class="icon icon-md" style="position: absolute; top: 16mm; left: 155mm;">@include('pdf.partials.icons.book')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 14mm; left: 188mm;">@include('pdf.partials.icons.cross')</div>
 
-            <div class="icon icon-book" style="top: 110px; left: 30px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-mountain" style="top: 94px; left: 100px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-church" style="top: 150px; left: 132px;">@include('pdf.partials.icons.church')</div>
-            <div class="icon icon-cross" style="top: 110px; right: 108px;">@include('pdf.partials.icons.cross')</div>
-            <div class="icon icon-church" style="top: 132px; right: 18px;">@include('pdf.partials.icons.church')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 50mm; left: 14mm;">@include('pdf.partials.icons.book')</div>
+    <div class="icon icon-md" style="position: absolute; top: 70mm; left: 18mm;">@include('pdf.partials.icons.church')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 50mm; left: 186mm;">@include('pdf.partials.icons.mountain')</div>
+    <div class="icon icon-md" style="position: absolute; top: 72mm; left: 184mm;">@include('pdf.partials.icons.cross')</div>
 
-            <div class="icon icon-fish" style="top: 252px; left: 18px;">@include('pdf.partials.icons.fish')</div>
-            <div class="icon icon-book" style="top: 332px; left: 52px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-mountain" style="top: 418px; left: 110px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-cross" style="top: 470px; left: 122px;">@include('pdf.partials.icons.cross')</div>
-            <div class="icon icon-church" style="bottom: 12px; left: 10px;">@include('pdf.partials.icons.church')</div>
-            <div class="icon icon-book" style="bottom: 18px; left: 100px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-fish" style="bottom: 52px; left: 174px;">@include('pdf.partials.icons.fish')</div>
-            <div class="icon icon-mountain" style="bottom: 4px; left: 230px;">@include('pdf.partials.icons.mountain')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 120mm; left: 12mm;">@include('pdf.partials.icons.fish')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 150mm; left: 16mm;">@include('pdf.partials.icons.mountain')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 120mm; left: 188mm;">@include('pdf.partials.icons.book')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 150mm; left: 186mm;">@include('pdf.partials.icons.fish')</div>
 
-            <div class="icon icon-book" style="top: 226px; right: 64px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-fish" style="top: 332px; right: 16px;">@include('pdf.partials.icons.fish')</div>
-            <div class="icon icon-mountain" style="top: 406px; right: 106px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-mountain" style="top: 404px; right: 18px;">@include('pdf.partials.icons.mountain')</div>
-            <div class="icon icon-cross" style="bottom: 42px; right: 170px;">@include('pdf.partials.icons.cross')</div>
-            <div class="icon icon-book" style="bottom: 28px; right: 96px;">@include('pdf.partials.icons.book')</div>
-            <div class="icon icon-church" style="bottom: 12px; right: 20px;">@include('pdf.partials.icons.church')</div>
-            <div class="icon icon-fish" style="bottom: 20px; right: 160px;">@include('pdf.partials.icons.fish')</div>
-        </div>
+    <div class="icon icon-md" style="position: absolute; top: 200mm; left: 14mm;">@include('pdf.partials.icons.cross')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 225mm; left: 18mm;">@include('pdf.partials.icons.church')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 200mm; left: 186mm;">@include('pdf.partials.icons.mountain')</div>
+    <div class="icon icon-md" style="position: absolute; top: 228mm; left: 184mm;">@include('pdf.partials.icons.church')</div>
 
-        <div class="content">
-            <div class="top-logo">@include('pdf.partials.icons.book')</div>
-            <div class="eyebrow">Certificado de conclusao</div>
-            <div class="title">Movimento Casa</div>
+    <div class="icon icon-md" style="position: absolute; top: 268mm; left: 14mm;">@include('pdf.partials.icons.book')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 272mm; left: 60mm;">@include('pdf.partials.icons.fish')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 268mm; left: 110mm;">@include('pdf.partials.icons.mountain')</div>
+    <div class="icon icon-md" style="position: absolute; top: 270mm; left: 158mm;">@include('pdf.partials.icons.cross')</div>
+    <div class="icon icon-sm" style="position: absolute; top: 268mm; left: 188mm;">@include('pdf.partials.icons.church')</div>
 
-            <p class="text">Certificamos que</p>
+    {{-- Main content --}}
+    <div class="center-block">
+        <div class="top-logo">@include('pdf.partials.icons.church')</div>
 
-            <div class="member-name">{{ $member->full_name }}</div>
+        <div class="eyebrow">Certificado de conclusao</div>
 
-            <p class="text">concluiu com aproveitamento a formacao</p>
+        <div class="title">Movimento Casa</div>
 
-            <div class="formation-title">{{ $formation->title }}</div>
+        <div class="separator"></div>
 
-            <p class="text ministry-line">
-                @if ($formation->ministry?->name)
-                    vinculada ao ministerio {{ $formation->ministry->name }}
-                @endif
-            </p>
+        <p class="text">Certificamos que</p>
 
-            <div class="meta">
-                <p class="meta-line"><span class="meta-label">Data de conclusao:</span> {{ optional($progress->completed_at)->format('d/m/Y H:i') }}</p>
-                <p class="meta-line"><span class="meta-label">Carga horaria:</span> {{ $formation->workload_hours ? number_format((float) $formation->workload_hours, 2, ',', '.') . ' horas' : 'Nao informada' }}</p>
-                <p class="meta-line"><span class="meta-label">Codigo de autenticacao:</span> {{ $certificateCode }}</p>
-                <p class="meta-line"><span class="meta-label">Emitido em:</span> {{ $issuedAt->format('d/m/Y H:i') }}</p>
-            </div>
-        </div>
+        <div class="member-name">{{ $member->full_name }}</div>
+
+        <p class="text text-after-name">concluiu com aproveitamento a formacao</p>
+
+        <div class="formation-title">{{ $formation->title }}</div>
+
+        @if ($formation->ministry?->name)
+            <p class="ministry-line">vinculada ao ministerio {{ $formation->ministry->name }}</p>
+        @endif
     </div>
+
+    {{-- Bottom metadata with QR --}}
+    <div class="meta-area">
+        <table class="meta-table">
+            <tr>
+                <td class="qr-td">
+                    <img src="{{ $qrCodeDataUri }}" alt="QR Code" />
+                </td>
+                <td>
+                    <div class="meta">
+                        <p class="meta-line"><span class="meta-label">Data de conclusao:</span> {{ optional($progress->completed_at)->format('d/m/Y H:i') }}</p>
+                        <p class="meta-line"><span class="meta-label">Carga horaria:</span> {{ $formation->workload_hours ? number_format((float) $formation->workload_hours, 2, ',', '.') . ' horas' : 'Nao informada' }}</p>
+                        <p class="meta-line"><span class="meta-label">Nota final:</span> {{ $progress->quiz_score !== null ? number_format((float) $progress->quiz_score, 2, ',', '.') . '%' : 'N/A' }}</p>
+                        <p class="meta-line"><span class="meta-label">Codigo de autenticacao:</span> {{ $certificateCode }}</p>
+                        <p class="meta-line"><span class="meta-label">Emitido em:</span> {{ $issuedAt->format('d/m/Y H:i') }}</p>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
 </body>
 </html>

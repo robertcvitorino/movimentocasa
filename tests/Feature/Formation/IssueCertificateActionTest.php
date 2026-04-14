@@ -2,6 +2,7 @@
 
 use App\Actions\Formation\IssueCertificateAction;
 use App\Enums\FormationProgressStatus;
+use App\Models\Certificate;
 use App\Models\Formation;
 use App\Models\Member;
 use App\Models\MemberFormationProgress;
@@ -54,11 +55,76 @@ it('issues a certificate PDF using the Movimento Casa template', function () {
         'member' => $member,
         'formation' => $formation->load('ministry'),
         'progress' => $progress->fresh(),
+        'qrCodeDataUri' => 'data:image/png;base64,test',
     ])->render();
 
     expect($html)->toContain('Movimento Casa');
     expect($html)->toContain('Nome da Pessoa');
     expect($html)->toContain('Iluminacao');
     expect($html)->toContain('Codigo de autenticacao');
-    expect($html)->not->toContain('Nota final');
+    expect($html)->toContain('Nota final');
+    expect($html)->toContain('100,00%');
+    expect($html)->toContain('Producao');
+    expect($html)->toContain('size: 210mm 297mm');
+});
+
+it('generates a certificate with QR code for verification', function () {
+    Storage::fake('public');
+
+    $member = Member::factory()->create();
+    $formation = Formation::factory()->create([
+        'certificate_enabled' => true,
+        'workload_hours' => 10,
+    ]);
+
+    $progress = MemberFormationProgress::query()->create([
+        'member_id' => $member->getKey(),
+        'formation_id' => $formation->getKey(),
+        'status' => FormationProgressStatus::Completed,
+        'progress_percentage' => 100,
+        'started_at' => now()->subDays(3),
+        'completed_at' => now(),
+        'required_lessons_count' => 3,
+        'completed_required_lessons_count' => 3,
+        'quiz_score' => 85.50,
+        'quiz_passed_at' => now(),
+    ]);
+
+    $certificate = app(IssueCertificateAction::class)->execute($progress);
+
+    expect($certificate)->toBeInstanceOf(Certificate::class);
+    expect($certificate->verification_hash)->not->toBeNull();
+
+    Storage::disk('public')->assertExists($certificate->pdf_path);
+
+    $progress->refresh();
+    expect($progress->certificate_issued_at)->not->toBeNull();
+});
+
+it('returns existing certificate when already issued', function () {
+    Storage::fake('public');
+
+    $member = Member::factory()->create();
+    $formation = Formation::factory()->create([
+        'certificate_enabled' => true,
+    ]);
+
+    $progress = MemberFormationProgress::query()->create([
+        'member_id' => $member->getKey(),
+        'formation_id' => $formation->getKey(),
+        'status' => FormationProgressStatus::Completed,
+        'progress_percentage' => 100,
+        'started_at' => now()->subDays(3),
+        'completed_at' => now(),
+        'required_lessons_count' => 2,
+        'completed_required_lessons_count' => 2,
+    ]);
+
+    $action = app(IssueCertificateAction::class);
+
+    $first = $action->execute($progress);
+    $second = $action->execute($progress);
+
+    expect($first->getKey())->toBe($second->getKey());
+    expect(Certificate::query()->count())->toBe(1);
 });

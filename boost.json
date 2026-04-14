@@ -1,9 +1,9 @@
 {
     "agents": [
-        "codex"
+        "claude_code"
     ],
     "packages": [
-        "filament/blueprint"
+        "filament/filament"
     ],
     "skills": [
         "fluxui-development",

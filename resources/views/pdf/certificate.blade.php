@@ -209,7 +209,7 @@
     <div class="center-block">
         <div class="top-logo">@include('pdf.partials.icons.church')</div>
 
-        <div class="eyebrow">Certificado de conclusao</div>
+        <div class="eyebrow">Certificado de Conclusão</div>
 
         <div class="title">Movimento Casa</div>
 
@@ -219,12 +219,12 @@
 
         <div class="member-name">{{ $member->full_name }}</div>
 
-        <p class="text text-after-name">concluiu com aproveitamento a formacao</p>
+        <p class="text text-after-name">concluiu com aproveitamento a formação</p>
 
         <div class="formation-title">{{ $formation->title }}</div>
 
         @if ($formation->ministry?->name)
-            <p class="ministry-line">vinculada ao ministerio {{ $formation->ministry->name }}</p>
+            <p class="ministry-line">vinculada ao ministério {{ $formation->ministry->name }}</p>
         @endif
     </div>
 
@@ -237,9 +237,9 @@
                 </td>
                 <td>
                     <div class="meta">
-                        <p class="meta-line"><span class="meta-label">Data de conclusao:</span> {{ optional($progress->completed_at)->format('d/m/Y H:i') }}</p>
-                        <p class="meta-line"><span class="meta-label">Carga horaria:</span> {{ $formation->workload_hours ? number_format((float) $formation->workload_hours, 2, ',', '.') . ' horas' : 'Nao informada' }}</p>
-                        <p class="meta-line"><span class="meta-label">Codigo de autenticacao:</span> {{ $certificateCode }}</p>
+                        <p class="meta-line"><span class="meta-label">Data de conclusão:</span> {{ optional($progress->completed_at)->format('d/m/Y H:i') }}</p>
+                        <p class="meta-line"><span class="meta-label">Carga horária:</span> {{ $formation->workload_hours ? number_format((float) $formation->workload_hours, 2, ',', '.') . ' horas' : 'Não informada' }}</p>
+                        <p class="meta-line"><span class="meta-label">Código de autenticação:</span> {{ $certificateCode }}</p>
                         <p class="meta-line"><span class="meta-label">Emitido em:</span> {{ $issuedAt->format('d/m/Y H:i') }}</p>
                     </div>
                 </td>

@@ -32,7 +32,7 @@ it('displays valid certificate info when code exists', function () {
 
     $this->get(route('certificate.verify', 'CERT-20260413-TESTCODE'))
         ->assertOk()
-        ->assertSee('Certificado Valido')
+        ->assertSee('Certificado Válido')
         ->assertSee('Joao Silva')
         ->assertSee('Musicalizacao')
         ->assertSee('Louvor')
@@ -42,5 +42,5 @@ it('displays valid certificate info when code exists', function () {
 it('displays not found when certificate code is invalid', function () {
     $this->get(route('certificate.verify', 'INVALID-CODE'))
         ->assertOk()
-        ->assertSee('Certificado Nao Encontrado');
+        ->assertSee('Certificado Não Encontrado');
 });

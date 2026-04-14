@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificacao de Certificado - Movimento Casa</title>
+    <title>Verificação de Certificado - Movimento Casa</title>
     <style>
         *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -75,7 +75,7 @@
     <div class="w-full max-w-lg">
         <div class="text-center mb-6">
             <h1 class="text-2xl font-bold text-gray-900">Movimento Casa</h1>
-            <p class="text-sm text-gray-500 mt-1">Verificacao de Certificado</p>
+            <p class="text-sm text-gray-500 mt-1">Verificação de Certificado</p>
         </div>
 
         @if ($certificate)
@@ -85,8 +85,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.746 3.746 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
                     </svg>
                     <div>
-                        <p class="font-semibold text-green-800">Certificado Valido</p>
-                        <p class="text-sm text-green-600">Este certificado e autentico e foi emitido pelo Movimento Casa.</p>
+                        <p class="font-semibold text-green-800">Certificado Válido</p>
+                        <p class="text-sm text-green-600">Este certificado é autêntico e foi emitido pelo Movimento Casa.</p>
                     </div>
                 </div>
 
@@ -97,16 +97,16 @@
                     </div>
 
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Formacao</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Formação</p>
                         <p class="text-lg font-semibold text-blue-700 mt-0.5">{{ $certificate->formation->title }}</p>
                         @if ($certificate->formation->ministry?->name)
-                            <p class="text-sm text-gray-500">Ministerio: {{ $certificate->formation->ministry->name }}</p>
+                            <p class="text-sm text-gray-500">Ministério: {{ $certificate->formation->ministry->name }}</p>
                         @endif
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
                         <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Data de Conclusao</p>
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Data de Conclusão</p>
                             <p class="text-sm font-medium text-gray-900 mt-0.5">{{ optional($certificate->formationProgress?->completed_at)->format('d/m/Y H:i') ?? 'N/A' }}</p>
                         </div>
                         <div>
@@ -114,15 +114,15 @@
                             <p class="text-sm font-medium text-gray-900 mt-0.5">{{ $certificate->issued_at->format('d/m/Y H:i') }}</p>
                         </div>
                         <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Carga Horaria</p>
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Carga Horária</p>
                             <p class="text-sm font-medium text-gray-900 mt-0.5">
-                                {{ $certificate->formation->workload_hours ? number_format((float) $certificate->formation->workload_hours, 2, ',', '.') . ' horas' : 'Nao informada' }}
+                                {{ $certificate->formation->workload_hours ? number_format((float) $certificate->formation->workload_hours, 2, ',', '.') . ' horas' : 'Não informada' }}
                             </p>
                         </div>
                     </div>
 
                     <div class="pt-2 border-t border-gray-100">
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Codigo de Autenticacao</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Código de Autenticação</p>
                         <p class="text-sm font-mono font-medium text-gray-900 mt-0.5">{{ $certificate->certificate_code }}</p>
                     </div>
                 </div>
@@ -134,12 +134,12 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                     </svg>
                     <div>
-                        <p class="font-semibold text-red-800">Certificado Nao Encontrado</p>
-                        <p class="text-sm text-red-600">O codigo informado nao corresponde a nenhum certificado emitido.</p>
+                        <p class="font-semibold text-red-800">Certificado Não Encontrado</p>
+                        <p class="text-sm text-red-600">O código informado não corresponde a nenhum certificado emitido.</p>
                     </div>
                 </div>
                 <div class="px-6 py-5 text-center">
-                    <p class="text-sm text-gray-600">Verifique se o codigo ou QR code esta correto e tente novamente.</p>
+                    <p class="text-sm text-gray-600">Verifique se o código ou QR code está correto e tente novamente.</p>
                 </div>
             </div>
         @endif

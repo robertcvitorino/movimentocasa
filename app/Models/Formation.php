@@ -25,7 +25,6 @@ class Formation extends Model
         'ministry_id',
         'is_required',
         'status',
-        'minimum_score',
         'certificate_enabled',
         'workload_hours',
         'published_at',

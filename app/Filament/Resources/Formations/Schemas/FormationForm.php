@@ -35,7 +35,8 @@ class FormationForm
                             ->image()
                             ->disk('public')
                             ->directory('formations/covers')
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->hidden(),
 
                         TextInput::make('title')
                             ->label('Titulo')
@@ -60,24 +61,16 @@ class FormationForm
                                 if (filled($slug)) {
                                     $set('slug', $slug);
                                 }
-                            })
-                            ->required(),
+                            }),
 
                         TextInput::make('slug')
                             ->label('Slug')
                             ->required()
-                            ->columnSpan(1)
-                            ->unique(ignoreRecord: true),
+                            ->columnSpan(1),
 
                         TextInput::make('workload_hours')
                             ->label('Carga horaria')
                             ->numeric(),
-
-                        TextInput::make('minimum_score')
-                            ->label('Nota minima')
-                            ->numeric()
-                            ->disabled(fn (Get $get): bool => $get('quiz.is_active') === false)
-                            ->default(70),
 
                         Select::make('status')
                             ->label('Status')
@@ -86,22 +79,22 @@ class FormationForm
 
                         Toggle::make('is_required')
                             ->label('Obrigatorio')
-                            ->inline(),
+                            ->inline(false),
 
                         Toggle::make('certificate_enabled')
-                            ->inline()
+                            ->inline(false)
                             ->label('Gera certificado?'),
 
-                        RichEditor::make('full_description')
-                            ->label('Descricao')
-                            ->extraInputAttributes([
-                                'style' => 'min-height: 6rem;',
-                            ])
-                            ->columnSpanFull(),
+//                        RichEditor::make('full_description')
+//                            ->label('Descricao')
+//                            ->extraInputAttributes([
+//                                'style' => 'min-height: 6rem;',
+//                            ])
+//                            ->columnSpanFull(),
 
 
                     ]),
-                Section::make('Videoaulas')
+                Section::make('Video aulas')
                     ->columns(6)
                     ->columnSpanFull()
                     ->schema([
@@ -175,10 +168,10 @@ class FormationForm
                                     ->label('Ativa')
                                     ->default(true),
 
-                                Textarea::make('description')
-                                    ->label('Descricao')
-                                    ->rows(3)
-                                    ->columnSpanFull(),
+//                                Textarea::make('description')
+//                                    ->label('Descricao')
+//                                    ->rows(3)
+//                                    ->columnSpanFull(),
 
                                 RichEditor::make('support_text')
                                     ->label('Texto de apoio da etapa')

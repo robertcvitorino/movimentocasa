@@ -18,13 +18,12 @@ class FormationFactory extends Factory
     {
         return [
             'title' => fake()->sentence(3),
-            'slug' => Str::slug(fake()->unique()->sentence(3)),
+            'slug' => Str::slug(fake()->sentence(3)),
             'short_description' => fake()->sentence(),
             'full_description' => fake()->paragraph(),
             'ministry_id' => null,
             'is_required' => fake()->boolean(),
             'status' => fake()->randomElement(FormationStatus::cases()),
-            'minimum_score' => 70,
             'certificate_enabled' => true,
             'workload_hours' => fake()->randomFloat(1, 1, 20),
             'published_at' => now(),

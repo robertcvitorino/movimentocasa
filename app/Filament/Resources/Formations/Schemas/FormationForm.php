@@ -81,6 +81,11 @@ class FormationForm
                             ->label('Obrigatorio')
                             ->inline(false),
 
+                        Toggle::make('is_general')
+                            ->label('Exibir para todos')
+                            ->helperText('Inativo: visível somente para membros do ministério vinculado.')
+                            ->inline(false),
+
                         Toggle::make('certificate_enabled')
                             ->inline(false)
                             ->label('Gera certificado?'),

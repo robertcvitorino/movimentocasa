@@ -25,6 +25,7 @@ class Formation extends Model
         'cover_image_path',
         'ministry_id',
         'is_required',
+        'is_general',
         'status',
         'certificate_enabled',
         'quiz_enabled',
@@ -38,6 +39,7 @@ class Formation extends Model
     {
         return [
             'is_required' => 'boolean',
+            'is_general' => 'boolean',
             'certificate_enabled' => 'boolean',
             'quiz_enabled' => 'boolean',
             'published_at' => 'datetime',

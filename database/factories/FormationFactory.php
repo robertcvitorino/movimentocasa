@@ -23,6 +23,7 @@ class FormationFactory extends Factory
             'full_description' => fake()->paragraph(),
             'ministry_id' => null,
             'is_required' => fake()->boolean(),
+            'is_general' => true,
             'status' => fake()->randomElement(FormationStatus::cases()),
             'certificate_enabled' => true,
             'quiz_enabled' => false,

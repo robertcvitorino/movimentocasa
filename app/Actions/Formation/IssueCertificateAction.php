@@ -43,7 +43,7 @@ class IssueCertificateAction
                 'formation' => $progress->formation,
                 'progress' => $progress,
                 'qrCodeDataUri' => $qrCodeDataUri,
-            ])->setPaper('a4', 'portrait');
+            ])->setPaper('a4', 'landscape');
 
             Storage::disk('public')->put($filePath, $pdf->output());
 

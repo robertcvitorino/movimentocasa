@@ -119,12 +119,6 @@
                                 {{ $certificate->formation->workload_hours ? number_format((float) $certificate->formation->workload_hours, 2, ',', '.') . ' horas' : 'Nao informada' }}
                             </p>
                         </div>
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Nota Final</p>
-                            <p class="text-sm font-medium text-gray-900 mt-0.5">
-                                {{ $certificate->formationProgress?->quiz_score !== null ? number_format((float) $certificate->formationProgress->quiz_score, 2, ',', '.') . '%' : 'N/A' }}
-                            </p>
-                        </div>
                     </div>
 
                     <div class="pt-2 border-t border-gray-100">

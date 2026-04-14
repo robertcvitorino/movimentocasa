@@ -62,10 +62,9 @@ it('issues a certificate PDF using the Movimento Casa template', function () {
     expect($html)->toContain('Nome da Pessoa');
     expect($html)->toContain('Iluminacao');
     expect($html)->toContain('Codigo de autenticacao');
-    expect($html)->toContain('Nota final');
-    expect($html)->toContain('100,00%');
     expect($html)->toContain('Producao');
-    expect($html)->toContain('size: 210mm 297mm');
+    expect($html)->toContain('size: 297mm 210mm');
+    expect($html)->not->toContain('Nota final');
 });
 
 it('generates a certificate with QR code for verification', function () {

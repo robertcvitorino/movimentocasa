@@ -222,6 +222,18 @@ class FormationForm
                             ->defaultItems(0)
                             ->collapsed()
                             ->reorderableWithButtons()
+                            ->afterStateHydrated(function (?array $state, Set $set): void {
+                                $normalized = self::normalizeRepeaterDisplayOrder($state ?? []);
+                                if (($state ?? []) !== $normalized) {
+                                    $set('questions', $normalized);
+                                }
+                            })
+                            ->afterStateUpdated(function (?array $state, Set $set): void {
+                                $normalized = self::normalizeRepeaterDisplayOrder($state ?? []);
+                                if (($state ?? []) !== $normalized) {
+                                    $set('questions', $normalized);
+                                }
+                            })
                             ->itemLabel(fn (array $state): ?string => $state['statement'] ?? 'Pergunta')
                             ->schema([
                                 Textarea::make('statement')
@@ -237,6 +249,8 @@ class FormationForm
                                 TextInput::make('display_order')
                                     ->label('Ordem')
                                     ->numeric()
+                                    ->readOnly()
+                                    ->dehydrated()
                                     ->default(1),
                                 Toggle::make('is_active')
                                     ->label('Ativa')
@@ -270,11 +284,14 @@ class FormationForm
                                                 if (! $state) {
                                                     return;
                                                 }
-                                                // Garante apenas uma alternativa correta por pergunta
+                                                // Identifica a alternativa atual pelo display_order (único por pergunta)
+                                                $currentOrder = (int) $get('display_order');
                                                 $options = $get('../../options') ?? [];
-                                                $currentKey = $get('../../options');
+
                                                 foreach ($options as $key => $option) {
-                                                    if (($option['is_correct'] ?? false) && $key !== array_key_last($options)) {
+                                                    $isCurrentOption = (int) ($option['display_order'] ?? 0) === $currentOrder;
+
+                                                    if (! $isCurrentOption && ($option['is_correct'] ?? false)) {
                                                         $set("../../options.{$key}.is_correct", false);
                                                     }
                                                 }

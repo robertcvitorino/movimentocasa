@@ -4,39 +4,67 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Enums\RoleName;
-use App\Models\Notice;
 use Illuminate\Foundation\Auth\User as AuthUser;
+use App\Models\Notice;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class NoticePolicy
 {
+    use HandlesAuthorization;
+    
     public function viewAny(AuthUser $authUser): bool
     {
-        return true;
+        return $authUser->can('ViewAny:Notice');
     }
 
     public function view(AuthUser $authUser, Notice $notice): bool
     {
-        return true;
+        return $authUser->can('View:Notice');
     }
 
     public function create(AuthUser $authUser): bool
     {
-        return $authUser->hasAnyRole([
-            RoleName::SystemAdmin->value,
-            RoleName::GeneralCoordinator->value,
-            RoleName::MinistryCoordinator->value,
-        ]);
+        return $authUser->can('Create:Notice');
     }
 
     public function update(AuthUser $authUser, Notice $notice): bool
     {
-        return $this->create($authUser);
+        return $authUser->can('Update:Notice');
     }
 
     public function delete(AuthUser $authUser, Notice $notice): bool
     {
-        return $this->create($authUser);
+        return $authUser->can('Delete:Notice');
     }
-}
 
+    public function restore(AuthUser $authUser, Notice $notice): bool
+    {
+        return $authUser->can('Restore:Notice');
+    }
+
+    public function forceDelete(AuthUser $authUser, Notice $notice): bool
+    {
+        return $authUser->can('ForceDelete:Notice');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:Notice');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:Notice');
+    }
+
+    public function replicate(AuthUser $authUser, Notice $notice): bool
+    {
+        return $authUser->can('Replicate:Notice');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:Notice');
+    }
+
+}

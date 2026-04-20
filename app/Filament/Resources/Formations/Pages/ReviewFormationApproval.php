@@ -144,12 +144,13 @@ class ReviewFormationApproval extends Page implements HasForms
             // ── Dados da Formação ─────────────────────────────────
             Section::make('Dados da Formação')
                 ->description('Informações gerais sobre a formação submetida para revisão.')
-                ->columns(4)
+                ->columns(3)
                 ->schema([
+                    // Linha 1: Título (2 cols) | Ministério (1) | Carga horária (1)
                     Placeholder::make('title')
                         ->label('Título')
                         ->content(fn (): string => $formation->title)
-                        ->columnSpan(2),
+                        ->columnSpan(1),
 
                     Placeholder::make('ministry')
                         ->label('Ministério')
@@ -161,18 +162,21 @@ class ReviewFormationApproval extends Page implements HasForms
                             ? number_format($formation->workload_hours, 0) . 'h'
                             : '—'),
 
+                    // Linha 2: Criado por (1) | Enviado para revisão (2 cols) | vazio (1)
                     Placeholder::make('creator')
                         ->label('Criado por')
                         ->content(fn (): string => $formation->creator?->name ?? '—'),
 
                     Placeholder::make('submitted_for_review_at')
                         ->label('Enviado para revisão')
-                        ->content(fn (): string => $formation->submitted_for_review_at?->format('d/m/Y \à\s H:i') ?? '—'),
+                        ->content(fn (): string => $formation->submitted_for_review_at?->format('d/m/Y \à\s H:i') ?? '—')
+                        ->columnSpan(1),
 
+                    // Linha 3: Configurações (full)
                     Placeholder::make('configuration')
                         ->label('Configurações')
                         ->content(fn (): HtmlString => $this->getConfigurationBadges($formation))
-                        ->columnSpanFull(),
+                        ->columnSpan(1),
                 ])
                 ->columnSpanFull(),
 
@@ -190,16 +194,6 @@ class ReviewFormationApproval extends Page implements HasForms
                         ->label('Descrição completa')
                         ->content(fn (): HtmlString => new HtmlString($formation->full_description ?? ''))
                         ->visible(fn (): bool => filled($formation->full_description)),
-                ])
-                ->columnSpanFull(),
-
-            // ── Aulas ─────────────────────────────────────────────
-            Section::make('Aulas')
-                ->description(fn (): string => $formation->activeLessons->count() . ' aula(s) ativa(s)')
-                ->schema([
-                    View::make('filament.resources.formations.components.formation-approval-lessons')
-                        ->viewData(['formation' => $formation])
-                        ->columnSpanFull(),
                 ])
                 ->columnSpanFull(),
 
